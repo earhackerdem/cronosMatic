@@ -42,3 +42,6 @@ clean: ## Detener servicios y eliminar volúmenes
 
 test-back: ## Ejecutar tests del backend
 	cd backend && uv run pytest
+
+test-front: ## Ejecutar tests del frontend
+	cd frontend && npm run test:ci
