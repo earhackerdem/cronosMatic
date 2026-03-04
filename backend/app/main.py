@@ -1,9 +1,21 @@
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.config import settings
+from app.db.engine import engine
 
-app = FastAPI(title="CronosMatic API", debug=settings.debug)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+    yield
+    await engine.dispose()
+
+
+app = FastAPI(title="CronosMatic API", debug=settings.debug, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,5 +27,13 @@ app.add_middleware(
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+async def health() -> dict:
+    result: dict[str, str] = {"status": "ok"}
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        result["database"] = "connected"
+    except Exception:
+        result["status"] = "degraded"
+        result["database"] = "unavailable"
+    return result

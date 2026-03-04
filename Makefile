@@ -38,6 +38,14 @@ status: ## Mostrar estado de los servicios
 clean: ## Detener servicios y eliminar volúmenes
 	docker compose down -v
 
+##@ Database
+
+db-migrate: ## Run Alembic migrations
+	cd backend && uv run alembic upgrade head
+
+db-revision: ## Create new migration (uso: make db-revision MSG="description")
+	cd backend && uv run alembic revision --autogenerate -m "$(MSG)"
+
 ##@ Tests
 
 test-back: ## Ejecutar tests del backend
