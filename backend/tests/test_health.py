@@ -11,7 +11,7 @@ async def test_health_returns_ok_with_db(client):
     mock_connect.__aenter__ = AsyncMock(return_value=mock_conn)
     mock_connect.__aexit__ = AsyncMock(return_value=False)
 
-    with patch("app.main.engine") as mock_engine:
+    with patch("app.api.routers.health.engine") as mock_engine:
         mock_engine.connect.return_value = mock_connect
         response = await client.get("/health")
 
@@ -23,9 +23,10 @@ async def test_health_returns_ok_with_db(client):
 
 @pytest.mark.asyncio
 async def test_health_returns_degraded_when_db_unavailable(client):
-    with patch("app.main.engine") as mock_engine:
+    with patch("app.api.routers.health.engine") as mock_engine:
         mock_engine.connect.side_effect = ConnectionRefusedError("DB down")
         response = await client.get("/health")
+
 
     assert response.status_code == 200
     data = response.json()

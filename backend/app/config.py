@@ -8,9 +8,11 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:4200"
 
     database_url: str = Field(
-        default="postgresql+asyncpg://cronosmatic:change-me-in-production@localhost:5432/cronosmatic",
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/cronosmatic_dev",
         validation_alias="DATABASE_URL",
+        description="Connection string for PostgreSQL. MUST be overridden in production via environment variables.",
     )
+
 
     model_config = {"env_prefix": "BACKEND_"}
 
