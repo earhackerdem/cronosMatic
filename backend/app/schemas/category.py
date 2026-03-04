@@ -1,0 +1,21 @@
+import uuid
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class CategoryBase(BaseModel):
+    name: dict[str, str] = Field(..., description="i18n category name")
+    slug: str = Field(..., max_length=255, description="URL-friendly slug")
+    description: dict[str, str] | None = Field(
+        default=None, description="i18n category description"
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CategoryCreate(CategoryBase):
+    pass
+
+
+class CategoryResponse(CategoryBase):
+    id: uuid.UUID

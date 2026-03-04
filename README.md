@@ -1,23 +1,23 @@
 # CronosMatic
 
-Sistema de gestión de turnos inteligente.
+Intelligent shift management system.
 
 ## Prerequisites
 
 - Docker & Docker Compose v2
 - Make
-- (Opcional) Python 3, Node.js
+- (Optional) Python 3, Node.js
 
 ## Quick Start
 
 ```bash
-make setup    # Valida herramientas y genera .env
-make up       # Levanta los servicios
-make logs     # Ver logs en tiempo real
-make down     # Detener servicios
+make setup    # Validates tools and generates .env
+make up       # Starts services
+make logs     # View real-time logs
+make down     # Stops services
 ```
 
-## Estructura del proyecto
+## Project structure
 
 ```
 cronosMatic/
@@ -30,6 +30,6 @@ cronosMatic/
 └── README.md
 ```
 
-## Comandos disponibles
+## Available commands
 
-Ejecuta `make help` para ver todos los comandos.
+Run `make help` to see all available commands.
