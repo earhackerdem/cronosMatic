@@ -1,9 +1,19 @@
-# CronosMatic - Backend
+# CronosMatic – Backend
 
-Stack planeado:
+FastAPI backend for CronosMatic.
 
-- **Framework**: FastAPI
-- **Package manager**: Poetry / uv
-- **Base de datos**: PostgreSQL + pgvector
-- **ORM**: SQLAlchemy (async)
-- **Testing**: pytest
+## Quick start
+
+```bash
+# Install dependencies
+uv sync
+
+# Run dev server
+uv run uvicorn app.main:app --reload
+
+# Run tests
+uv run pytest
+
+# Lint
+uv run ruff check .
+```

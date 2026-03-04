@@ -37,3 +37,8 @@ status: ## Mostrar estado de los servicios
 
 clean: ## Detener servicios y eliminar volúmenes
 	docker compose down -v
+
+##@ Tests
+
+test-back: ## Ejecutar tests del backend
+	cd backend && uv run pytest

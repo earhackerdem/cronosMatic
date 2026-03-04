@@ -51,6 +51,16 @@ info "Checking optional tools..."
 check_optional python3
 check_optional node
 
+# ── uv (Python package manager) ─────────────────────────
+echo ""
+if command -v uv &>/dev/null; then
+  ok "uv found"
+else
+  info "Installing uv..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ok "uv installed"
+fi
+
 if [ "$MISSING" -eq 1 ]; then
   echo ""
   fail "Missing required tools. Please install them and retry."
