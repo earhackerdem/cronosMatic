@@ -21,7 +21,7 @@ setup: ## Ejecutar setup.sh + git init
 ##@ Docker
 
 up: ## Levantar todos los servicios
-	@docker compose up -d || echo "No services defined yet (see docker-compose.yml)"
+	docker compose up -d
 
 down: ## Detener todos los servicios
 	docker compose down
@@ -45,3 +45,5 @@ test-back: ## Ejecutar tests del backend
 
 test-front: ## Ejecutar tests del frontend
 	cd frontend && npm run test:ci
+
+test: test-back test-front ## Ejecutar todos los tests
