@@ -23,7 +23,7 @@ class CategoryModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    slug: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
+    slug: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[dict[str, str]] = mapped_column(JSONB, nullable=False)
     description: Mapped[dict[str, str] | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
