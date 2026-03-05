@@ -56,6 +56,8 @@ class CategoryService:
 
         try:
             return await self.repository.update(category)
+        except ValueError:
+            return None
         except IntegrityError:
             raise CategoryConflictError(f"Category with slug '{category.slug}' already exists")
 
@@ -81,6 +83,8 @@ class CategoryService:
 
         try:
             return await self.repository.update(category)
+        except ValueError:
+            return None
         except IntegrityError:
             raise CategoryConflictError(f"Category with slug '{slug}' already exists")
 
