@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -17,5 +18,17 @@ class CategoryCreate(CategoryBase):
     pass
 
 
+class CategoryUpdate(BaseModel):
+    """PATCH - all fields optional."""
+
+    name: dict[str, str] | None = None
+    slug: str | None = Field(default=None, max_length=255)
+    description: dict[str, str] | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CategoryResponse(CategoryBase):
     id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
