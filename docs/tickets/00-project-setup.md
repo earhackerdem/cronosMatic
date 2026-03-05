@@ -82,7 +82,7 @@ app/
 │   └── health.py
 ├── tasks/                     # Celery tasks
 │   ├── __init__.py
-│   └── email_tasks.py
+│   └── email_tasks.py         # Use asyncio.run() for async service calls
 └── utils/                     # Helpers
     ├── __init__.py
     ├── security.py            # JWT encode/decode, password hash/verify
@@ -141,8 +141,8 @@ MAIL_USERNAME=<username>
 MAIL_PASSWORD=<password>
 
 # App
-APP_ENV=development
-APP_DEBUG=true
+ENVIRONMENT=development
+DEBUG=true
 CORS_ORIGINS=http://localhost:5173
 DEFAULT_SHIPPING_COST=100.00
 ```

@@ -54,8 +54,6 @@ Table: order_items
 | quantity       | Integer       | NOT NULL                       |
 | price_per_unit | Decimal(10,2) | NOT NULL                       |
 | total_price    | Decimal(10,2) | NOT NULL                       |
-| created_at     | DateTime      | NOT NULL, DEFAULT now()        |
-| updated_at     | DateTime      | NOT NULL, DEFAULT now()        |
 ```
 
 **Rule:** `total_price` is auto-calculated as `quantity * price_per_unit` before saving.
@@ -119,7 +117,7 @@ Table: order_items
 **Request body (authenticated user):**
 ```json
 {
-  "shipping_address_id": "integer (required, must exist and belong to user)",
+  "shipping_address_id": "integer (required)",
   "billing_address_id": "integer (optional, defaults to shipping_address_id)",
   "payment_method": "string (required, only 'paypal' supported currently)",
   "shipping_method_name": "string (optional)",
@@ -196,7 +194,8 @@ Table: order_items
 11. **Do NOT clear the cart here.** The cart is cleared after successful payment (see Ticket 07).
 
 **Errors:**
-- 422: empty cart, insufficient stock, address not found, invalid payment_method, guest_email required for guests.
+- 422: empty cart, insufficient stock, invalid payment_method, guest_email required for guests
+- 403 or 422: `shipping_address_id` not found or does not belong to the user (handled sequentially in the endpoint logic).
 
 ---
 

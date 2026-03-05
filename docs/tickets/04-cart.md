@@ -46,8 +46,6 @@ Table: cart_items
 | quantity    | Integer       | NOT NULL                                        |
 | unit_price  | Decimal(10,2) | NOT NULL                                        |
 | total_price | Decimal(10,2) | NOT NULL                                        |
-| created_at  | DateTime      | NOT NULL, DEFAULT now()                         |
-| updated_at  | DateTime      | NOT NULL, DEFAULT now()                         |
 ```
 
 **Constraint:** UNIQUE(`cart_id`, `product_id`) — a product can only appear once per cart.
@@ -120,7 +118,7 @@ Same format but with `session_id` instead of `user_id`, and includes `expires_at
 **Request body:**
 ```json
 {
-  "product_id": "integer (required, must exist)",
+  "product_id": "integer (required)",
   "quantity": "integer (required, >= 1)"
 }
 ```
@@ -128,6 +126,7 @@ Same format but with `session_id` instead of `user_id`, and includes `expires_at
 **Response 201:** The full updated cart (same format as GET /cart).
 
 **Business rules:**
+- `product_id` existence must be validated against the database inside the API handler or Service layer, throwing a `422 Unprocessable Entity` if it fails (not handled by pure Pydantic).
 - If the product is NOT active (`is_active = false`) → 422 with `{ "detail": "Product is not available" }`.
 - If there is not enough stock → 422 with `{ "detail": "Insufficient stock" }`.
 - If the product **already exists** in the cart → increment the existing CartItem's `quantity` (do NOT create a new one). Re-verify stock with the total quantity.

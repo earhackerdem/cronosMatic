@@ -93,6 +93,7 @@ It is enqueued when `OrderService.update_payment_status()` receives `payment_sta
 
 ```python
 # app/tasks/order_tasks.py
+import asyncio
 
 @celery_app.task
 def cancel_abandoned_orders():
@@ -102,13 +103,15 @@ def cancel_abandoned_orders():
     Runs periodically via Celery Beat.
     """
     # 1. Query orders where status == PENDING_PAYMENT and created_at < now() - 30 minutes
-    # 2. For each order, call OrderService.cancel_order(order, reason="Abandoned checkout")
+    # 2. For each order, execute the async cancel_order service using asyncio.run
+    # asyncio.run(OrderService.cancel_order(order, reason="Abandoned checkout"))
 ```
 
 ### Email Task
 
 ```python
 # app/tasks/email_tasks.py
+import asyncio
 
 @celery_app.task(bind=True, max_retries=3, default_retry_delay=60)
 def send_order_confirmation_email(self, order_id: int):
@@ -117,7 +120,7 @@ def send_order_confirmation_email(self, order_id: int):
     Runs asynchronously via Celery worker.
     Retries up to 3 times on failure.
     """
-    # 1. Fetch order from DB (with items, addresses, user)
+    # 1. Fetch order from DB (using a sync DB engine or wrapping async fetch with asyncio.run)
     # 2. Determine recipient email
     # 3. Render HTML template
     # 4. Send via SMTP/SES

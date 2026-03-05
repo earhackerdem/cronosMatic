@@ -24,7 +24,6 @@ Table: users
 | email              | String(255)  | NOT NULL, UNIQUE               |
 | password           | String(255)  | NOT NULL (hashed with bcrypt)  |
 | is_admin           | Boolean      | NOT NULL, DEFAULT false        |
-| email_verified_at  | DateTime     | NULLABLE                       |
 | created_at         | DateTime     | NOT NULL, DEFAULT now()        |
 | updated_at         | DateTime     | NOT NULL, DEFAULT now(), ON UPDATE now() |
 ```
@@ -132,7 +131,7 @@ Table: users
 
 ---
 
-### GET /api/v1/auth/user
+### GET /api/v1/users/me
 
 **Auth:** Bearer token  
 **Response 200:**
@@ -211,8 +210,8 @@ Uses `get_current_user`, verifies that `user.is_admin == True`. If not, returns 
 - [ ] Login with correct credentials returns tokens
 - [ ] Login with incorrect credentials returns 422
 - [ ] Registration with a duplicate email returns 422
-- [ ] `GET /auth/user` with a valid token returns user data
-- [ ] `GET /auth/user` without a token returns 401
+- [ ] `GET /users/me` with a valid token returns user data
+- [ ] `GET /users/me` without a token returns 401
 - [ ] `POST /auth/refresh` with a valid refresh token returns a new access token
 - [ ] `POST /auth/refresh` with an expired refresh token returns 401
 - [ ] `POST /auth/logout` returns 204

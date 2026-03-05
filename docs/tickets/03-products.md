@@ -157,7 +157,7 @@ In the **response schema** (Pydantic), include `image_url`:
 **Request body:**
 ```json
 {
-  "category_id": "integer (required, must exist)",
+  "category_id": "integer (required)",
   "name": "string (required)",
   "sku": "string (required, unique)",
   "description": "string (optional)",
@@ -171,6 +171,9 @@ In the **response schema** (Pydantic), include `image_url`:
 ```
 
 **Response 201:** The created product.
+
+**Business Rules / Validation:**
+- `category_id` must be validated against the database to ensure it exists. This check should be implemented through a Dependency (`Depends()`) in the route handler or inside the Service layer (returning a 422 if it fails), since Pydantic schemas do not natively interact with the DB.
 
 ---
 
