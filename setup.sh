@@ -67,13 +67,42 @@ if [ "$MISSING" -eq 1 ]; then
   exit 1
 fi
 
+# ── Helper: generate random secret ──────────────────────
+generate_secret() {
+  openssl rand -base64 32 2>/dev/null || LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32
+}
+
 # ── Generate .env ────────────────────────────────────────
 echo ""
 if [ -f .env ]; then
   info ".env already exists, skipping generation"
 else
   cp .env.example .env
-  ok ".env created from .env.example"
+
+  # Replace placeholder secrets with random values
+  PG_PASS=$(generate_secret)
+  SECRET_KEY=$(generate_secret)
+
+  sed -i.bak "s|POSTGRES_PASSWORD=change-me-in-production|POSTGRES_PASSWORD=${PG_PASS}|" .env
+  sed -i.bak "s|BACKEND_SECRET_KEY=change-me-in-production|BACKEND_SECRET_KEY=${SECRET_KEY}|" .env
+  rm -f .env.bak
+
+  ok ".env created with generated secrets"
+fi
+
+# ── Validate .env defaults ──────────────────────────────
+echo ""
+info "Validating .env configuration..."
+
+set -a
+source .env
+set +a
+
+if [ "${POSTGRES_PASSWORD:-}" = "change-me-in-production" ]; then
+  warn "POSTGRES_PASSWORD is still the example default — run: make setup-secrets"
+fi
+if [ "${BACKEND_SECRET_KEY:-}" = "change-me-in-production" ]; then
+  warn "BACKEND_SECRET_KEY is still the example default — run: make setup-secrets"
 fi
 
 echo ""

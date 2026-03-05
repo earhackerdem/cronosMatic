@@ -4,13 +4,12 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     debug: bool = False
-    secret_key: str = "change-me-in-production"
+    secret_key: str = Field(description="Secret key for signing. Set via BACKEND_SECRET_KEY.")
     cors_origins: str = "http://localhost:4200"
 
     database_url: str = Field(
-        default="postgresql+asyncpg://cronosmatic:change-me-in-production@localhost:5432/cronosmatic",
         validation_alias="DATABASE_URL",
-        description="Connection string for PostgreSQL. MUST be overridden in production via environment variables.",
+        description="PostgreSQL connection string. Set via DATABASE_URL env var.",
     )
 
 

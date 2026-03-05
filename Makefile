@@ -19,6 +19,14 @@ setup: ## Run setup.sh + git init
 	@bash setup.sh
 	@if [ ! -d .git ]; then git init; fi
 
+setup-secrets: ## Regenerate POSTGRES_PASSWORD and BACKEND_SECRET_KEY in .env
+	@PG_PASS=$$(openssl rand -base64 32) && \
+	 SECRET_KEY=$$(openssl rand -base64 32) && \
+	 sed -i.bak "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$$PG_PASS|" .env && \
+	 sed -i.bak "s|^BACKEND_SECRET_KEY=.*|BACKEND_SECRET_KEY=$$SECRET_KEY|" .env && \
+	 rm -f .env.bak && \
+	 echo "Secrets regenerated in .env (rebuild containers: make clean up)"
+
 ##@ Docker
 
 up: ## Start all services
@@ -42,10 +50,10 @@ clean: ## Stop services and remove volumes
 ##@ Database
 
 db-migrate: ## Run Alembic migrations
-	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)" uv run alembic upgrade head
+	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" uv run alembic upgrade head
 
 db-revision: ## Create new migration (usage: make db-revision MSG="description")
-	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)" uv run alembic revision --autogenerate -m "$(MSG)"
+	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" uv run alembic revision --autogenerate -m "$(MSG)"
 
 db-admin: ## Show pgAdmin connection info
 	@echo "pgAdmin: http://localhost:$(PGADMIN_PORT)"

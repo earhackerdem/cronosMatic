@@ -26,6 +26,9 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Docker secrets
+docker/pgadmin/pgpass
+
 # Logs
 *.log
 

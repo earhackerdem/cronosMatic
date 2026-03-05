@@ -25,12 +25,15 @@ services:
     user: root
     entrypoint: >
       /bin/sh -c "
-      cp /pgadmin4/pgpass /tmp/pgpassfile &&
+      echo \"db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}\" > /tmp/pgpassfile &&
       chmod 600 /tmp/pgpassfile &&
       chown 5050:5050 /tmp/pgpassfile &&
       /entrypoint.sh
       "
     environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@cronosmatic.dev}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
       PGADMIN_LISTEN_PORT: 5050
@@ -40,7 +43,6 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
-      - ./docker/pgadmin/pgpass:/pgadmin4/pgpass:ro
     depends_on:
       db:
         condition: service_healthy
