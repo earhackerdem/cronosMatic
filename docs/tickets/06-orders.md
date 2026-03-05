@@ -102,7 +102,6 @@ Table: order_items
 
 ## Stock Reservation Pattern
 
-**IMPORTANT:** This differs from Laravel's behavior. Laravel decrements stock immediately. Here we use reservation.
 
 1. **When creating an order:** Use `SELECT ... FOR UPDATE` on the involved products (pessimistic locking). Verify available stock. Mark stock as reserved (decrement `stock_quantity`). If any product doesn't have enough stock → rollback and 422 error.
 2. **When confirming payment (payment_status → paid):** Stock was already decremented. Just change status.
