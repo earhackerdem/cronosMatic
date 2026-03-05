@@ -7,6 +7,10 @@ from app.domain.category.repository import CategoryRepositoryInterface
 from app.schemas.category import CategoryUpdate
 
 
+class CategoryConflictError(ValueError):
+    """Raised when a category slug conflicts with an existing one."""
+
+
 class CategoryService:
     def __init__(self, repository: CategoryRepositoryInterface):
         self.repository = repository
@@ -25,12 +29,12 @@ class CategoryService:
     ) -> Category:
         existing = await self.repository.get_by_slug(slug)
         if existing:
-            raise ValueError(f"Category with slug '{slug}' already exists")
+            raise CategoryConflictError(f"Category with slug '{slug}' already exists")
         category = Category(name=name_i18n, slug=slug, description=description_i18n)
         try:
             return await self.repository.create(category)
         except IntegrityError:
-            raise ValueError(f"Category with slug '{slug}' already exists")
+            raise CategoryConflictError(f"Category with slug '{slug}' already exists")
 
     async def update_category(
         self, category_id: uuid.UUID, data: CategoryUpdate
@@ -42,7 +46,7 @@ class CategoryService:
         if "slug" in data.model_fields_set and data.slug != category.slug:
             existing = await self.repository.get_by_slug(data.slug)
             if existing:
-                raise ValueError(f"Category with slug '{data.slug}' already exists")
+                raise CategoryConflictError(f"Category with slug '{data.slug}' already exists")
             category.slug = data.slug
 
         if "name" in data.model_fields_set:
@@ -53,7 +57,7 @@ class CategoryService:
         try:
             return await self.repository.update(category)
         except IntegrityError:
-            raise ValueError(f"Category with slug '{category.slug}' already exists")
+            raise CategoryConflictError(f"Category with slug '{category.slug}' already exists")
 
     async def replace_category(
         self,
@@ -69,7 +73,7 @@ class CategoryService:
         if slug != category.slug:
             existing = await self.repository.get_by_slug(slug)
             if existing:
-                raise ValueError(f"Category with slug '{slug}' already exists")
+                raise CategoryConflictError(f"Category with slug '{slug}' already exists")
 
         category.name = name_i18n
         category.slug = slug
@@ -78,7 +82,7 @@ class CategoryService:
         try:
             return await self.repository.update(category)
         except IntegrityError:
-            raise ValueError(f"Category with slug '{slug}' already exists")
+            raise CategoryConflictError(f"Category with slug '{slug}' already exists")
 
     async def delete_category(self, category_id: uuid.UUID) -> bool:
         return await self.repository.soft_delete(category_id)
