@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from app.config import settings
 from app.db.base import Base
 from app.models import Item  # noqa: F401 – register models with Base.metadata
+from app.models.category import CategoryModel  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:

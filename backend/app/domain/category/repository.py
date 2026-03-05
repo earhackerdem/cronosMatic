@@ -20,3 +20,11 @@ class CategoryRepositoryInterface(Protocol):
     async def get_all(self) -> list[Category]:
         """Retrieves all available categories."""
         ...
+
+    async def update(self, category: Category) -> Category:
+        """Updates an existing category in the storage."""
+        ...
+
+    async def soft_delete(self, category_id: uuid.UUID) -> bool:
+        """Marks a category as deleted without removing it from the storage."""
+        ...
