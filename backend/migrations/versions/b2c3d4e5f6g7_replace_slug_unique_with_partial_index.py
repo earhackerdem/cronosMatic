@@ -18,8 +18,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Drop the old unique constraint on slug (covers all rows including soft-deleted)
-    op.drop_constraint('categories_slug_key', 'categories', type_='unique')
+    # Drop the old unique index on slug (covers all rows including soft-deleted)
+    op.drop_index('ix_categories_slug', table_name='categories')
     # Create a partial unique index that only covers active (non-deleted) rows
     op.create_index(
         'uq_categories_slug_active',
@@ -32,4 +32,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_index('uq_categories_slug_active', table_name='categories')
-    op.create_unique_constraint('categories_slug_key', 'categories', ['slug'])
+    op.create_index('ix_categories_slug', 'categories', ['slug'], unique=True)
