@@ -69,7 +69,7 @@ fi
 
 # ── Helper: generate random secret ──────────────────────
 generate_secret() {
-  LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32
+  LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32 || true
 }
 
 # ── Generate .env ────────────────────────────────────────
