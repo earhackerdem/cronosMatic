@@ -69,7 +69,7 @@ fi
 
 # ── Helper: generate random secret ──────────────────────
 generate_secret() {
-  openssl rand -base64 32 2>/dev/null || LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32
+  LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32
 }
 
 # ── Generate .env ────────────────────────────────────────

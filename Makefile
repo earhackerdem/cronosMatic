@@ -20,8 +20,8 @@ setup: ## Run setup.sh + git init
 	@if [ ! -d .git ]; then git init; fi
 
 setup-secrets: ## Regenerate POSTGRES_PASSWORD and BACKEND_SECRET_KEY in .env
-	@PG_PASS=$$(openssl rand -base64 32) && \
-	 SECRET_KEY=$$(openssl rand -base64 32) && \
+	@PG_PASS=$$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32) && \
+	 SECRET_KEY=$$(LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32) && \
 	 sed -i.bak "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$$PG_PASS|" .env && \
 	 sed -i.bak "s|^BACKEND_SECRET_KEY=.*|BACKEND_SECRET_KEY=$$SECRET_KEY|" .env && \
 	 rm -f .env.bak && \
