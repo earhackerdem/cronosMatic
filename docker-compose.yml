@@ -28,6 +28,7 @@ services:
       echo \"db:5432:$${POSTGRES_DB}:$${POSTGRES_USER}:$${POSTGRES_PASSWORD}\" > /tmp/pgpassfile &&
       chmod 600 /tmp/pgpassfile &&
       chown 5050:5050 /tmp/pgpassfile &&
+      echo '{\"Servers\":{\"1\":{\"Name\":\"CronosMatic Dev\",\"Group\":\"Servers\",\"Host\":\"db\",\"Port\":5432,\"MaintenanceDB\":\"'$${POSTGRES_DB}'\",\"Username\":\"'$${POSTGRES_USER}'\",\"SSLMode\":\"prefer\",\"PassFile\":\"/tmp/pgpassfile\"}}}' > /pgadmin4/servers.json &&
       /entrypoint.sh
       "
     environment:
@@ -42,7 +43,6 @@ services:
       - "${PGADMIN_PORT:-5050}:5050"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
     depends_on:
       db:
         condition: service_healthy
