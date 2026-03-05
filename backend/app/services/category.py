@@ -1,5 +1,7 @@
 import uuid
 
+from sqlalchemy.exc import IntegrityError
+
 from app.domain.category.entity import Category
 from app.domain.category.repository import CategoryRepositoryInterface
 from app.schemas.category import CategoryUpdate
@@ -25,7 +27,10 @@ class CategoryService:
         if existing:
             raise ValueError(f"Category with slug '{slug}' already exists")
         category = Category(name=name_i18n, slug=slug, description=description_i18n)
-        return await self.repository.create(category)
+        try:
+            return await self.repository.create(category)
+        except IntegrityError:
+            raise ValueError(f"Category with slug '{slug}' already exists")
 
     async def update_category(
         self, category_id: uuid.UUID, data: CategoryUpdate
@@ -34,18 +39,21 @@ class CategoryService:
         if not category:
             return None
 
-        if data.slug is not None and data.slug != category.slug:
+        if "slug" in data.model_fields_set and data.slug != category.slug:
             existing = await self.repository.get_by_slug(data.slug)
             if existing:
                 raise ValueError(f"Category with slug '{data.slug}' already exists")
             category.slug = data.slug
 
-        if data.name is not None:
+        if "name" in data.model_fields_set:
             category.name = data.name
-        if data.description is not None:
+        if "description" in data.model_fields_set:
             category.description = data.description
 
-        return await self.repository.update(category)
+        try:
+            return await self.repository.update(category)
+        except IntegrityError:
+            raise ValueError(f"Category with slug '{category.slug}' already exists")
 
     async def replace_category(
         self,
@@ -67,7 +75,10 @@ class CategoryService:
         category.slug = slug
         category.description = description_i18n
 
-        return await self.repository.update(category)
+        try:
+            return await self.repository.update(category)
+        except IntegrityError:
+            raise ValueError(f"Category with slug '{slug}' already exists")
 
     async def delete_category(self, category_id: uuid.UUID) -> bool:
         return await self.repository.soft_delete(category_id)
