@@ -144,6 +144,7 @@ MAIL_PASSWORD=<password>
 APP_ENV=development
 APP_DEBUG=true
 CORS_ORIGINS=http://localhost:5173
+DEFAULT_SHIPPING_COST=100.00
 ```
 
 ---

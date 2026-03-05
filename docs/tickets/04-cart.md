@@ -79,37 +79,33 @@ For each cart request, determine the owner as follows:
 **Response 200 (authenticated user):**
 ```json
 {
-  "success": true,
-  "message": "Cart retrieved successfully",
-  "data": {
-    "id": 1,
-    "user_id": 5,
-    "total_items": 3,
-    "total_amount": "45.97",
-    "items": [
-      {
-        "id": 10,
-        "product_id": 2,
-        "product": {
-          "id": 2,
-          "name": "Reloj Elegante",
-          "slug": "reloj-elegante",
-          "price": "15.99",
-          "stock_quantity": 25,
-          "image_url": "https://s3.../products/abc.jpg"
-        },
-        "quantity": 2,
-        "unit_price": "15.99",
-        "total_price": "31.98"
-      }
-    ],
-    "summary": {
-      "subtotal": "45.97",
-      "total_items": 3
-    },
-    "created_at": "...",
-    "updated_at": "..."
-  }
+  "id": 1,
+  "user_id": 5,
+  "total_items": 3,
+  "total_amount": "45.97",
+  "items": [
+    {
+      "id": 10,
+      "product_id": 2,
+      "product": {
+        "id": 2,
+        "name": "Reloj Elegante",
+        "slug": "reloj-elegante",
+        "price": "15.99",
+        "stock_quantity": 25,
+        "image_url": "https://s3.../products/abc.jpg"
+      },
+      "quantity": 2,
+      "unit_price": "15.99",
+      "total_price": "31.98"
+    }
+  ],
+  "summary": {
+    "subtotal": "45.97",
+    "total_items": 3
+  },
+  "created_at": "...",
+  "updated_at": "..."
 }
 ```
 
@@ -132,8 +128,8 @@ Same format but with `session_id` instead of `user_id`, and includes `expires_at
 **Response 201:** The full updated cart (same format as GET /cart).
 
 **Business rules:**
-- If the product is NOT active (`is_active = false`) → 422 with `{ "success": false, "message": "Product is not available" }`.
-- If there is not enough stock → 422 with `{ "success": false, "message": "Insufficient stock" }`.
+- If the product is NOT active (`is_active = false`) → 422 with `{ "detail": "Product is not available" }`.
+- If there is not enough stock → 422 with `{ "detail": "Insufficient stock" }`.
 - If the product **already exists** in the cart → increment the existing CartItem's `quantity` (do NOT create a new one). Re-verify stock with the total quantity.
 - `unit_price` is taken from the current `product.price` at the time of adding.
 - CartItem `total_price` = `quantity * unit_price`.
@@ -154,7 +150,7 @@ Same format but with `session_id` instead of `user_id`, and includes `expires_at
 **Response 200:** The full updated cart.
 
 **Rules:**
-- Verify that the CartItem belongs to the current user/guest's cart. If not → 403 with `{ "success": false, "message": "Permission denied" }`.
+- Verify that the CartItem belongs to the current user/guest's cart. If not → 403 with `{ "detail": "Permission denied" }`.
 - Verify available stock for the new quantity.
 - Recalculate CartItem's `total_price` and Cart totals.
 

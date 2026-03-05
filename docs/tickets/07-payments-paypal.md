@@ -122,12 +122,9 @@ class PayPalPaymentService:
 **Response 200:**
 ```json
 {
-  "success": true,
-  "data": {
-    "paypal_order_id": "5O190127TN364715T",
-    "approval_url": "https://www.sandbox.paypal.com/checkoutnow?token=...",
-    "order_number": "CM-2026-A1B2C3D4"
-  }
+  "paypal_order_id": "5O190127TN364715T",
+  "approval_url": "https://www.sandbox.paypal.com/checkoutnow?token=...",
+  "order_number": "CM-2026-A1B2C3D4"
 }
 ```
 
@@ -151,13 +148,9 @@ class PayPalPaymentService:
 **Response 200:**
 ```json
 {
-  "success": true,
-  "message": "Payment captured successfully",
-  "data": {
-    "order_number": "CM-2026-A1B2C3D4",
-    "payment_status": "paid",
-    "capture_id": "2GG279541U471931P"
-  }
+  "order_number": "CM-2026-A1B2C3D4",
+  "payment_status": "paid",
+  "capture_id": "2GG279541U471931P"
 }
 ```
 
@@ -187,15 +180,11 @@ class PayPalPaymentService:
 **Response 200:**
 ```json
 {
-  "success": true,
-  "message": "Payment simulated successfully",
-  "data": {
-    "order_number": "CM-2026-A1B2C3D4",
-    "payment_status": "paid",
-    "simulated": true,
-    "paypal_order_id": "SIMULATED_abc123def456",
-    "capture_id": "CAPTURE_abc123def456"
-  }
+  "order_number": "CM-2026-A1B2C3D4",
+  "payment_status": "paid",
+  "simulated": true,
+  "paypal_order_id": "SIMULATED_abc123def456",
+  "capture_id": "CAPTURE_abc123def456"
 }
 ```
 
@@ -222,15 +211,11 @@ class PayPalPaymentService:
 **Response 200:**
 ```json
 {
-  "success": false,
-  "message": "Payment declined - simulated failure",
-  "data": {
-    "order_number": "CM-2026-A1B2C3D4",
-    "payment_status": "failed",
-    "simulated": true,
-    "paypal_order_id": "FAILED_abc123def456",
-    "error": "Payment declined - simulated failure"
-  }
+  "order_number": "CM-2026-A1B2C3D4",
+  "payment_status": "failed",
+  "simulated": true,
+  "paypal_order_id": "FAILED_abc123def456",
+  "error": "Payment declined - simulated failure"
 }
 ```
 
@@ -248,15 +233,12 @@ class PayPalPaymentService:
 **Response 200:**
 ```json
 {
-  "success": true,
-  "data": {
-    "mode": "sandbox",
-    "client_id_configured": true,
-    "client_secret_configured": true,
-    "simulate_payments": true,
-    "base_url": "https://api.sandbox.paypal.com",
-    "auth_test": "success"
-  }
+  "mode": "sandbox",
+  "client_id_configured": true,
+  "client_secret_configured": true,
+  "simulate_payments": true,
+  "base_url": "https://api.sandbox.paypal.com",
+  "auth_test": "success"
 }
 ```
 

@@ -19,6 +19,7 @@ Configure Celery with Redis as broker for asynchronous email delivery. Implement
 ```python
 # app/celery_app.py
 from celery import Celery
+from celery.schedules import crontab
 
 celery_app = Celery(
     "cronosmatic",
@@ -35,12 +36,24 @@ celery_app.conf.update(
     task_default_retry_delay=60,  # 60 seconds between retries
     task_max_retries=3,
 )
+
+# Celery Beat Schedule required for cron jobs
+celery_app.conf.beat_schedule = {
+    "cancel-abandoned-orders-every-15-mins": {
+        "task": "app.tasks.order_tasks.cancel_abandoned_orders",
+        "schedule": crontab(minute="*/15"),
+    },
+}
 ```
 
-### Worker command
+### Worker and Beat commands
 
 ```bash
+# Run the worker to process tasks
 celery -A app.celery_app worker --loglevel=info
+
+# Run beat to schedule cron tasks (in a separate terminal)
+celery -A app.celery_app beat --loglevel=info
 ```
 
 ---
@@ -74,7 +87,25 @@ It is enqueued when `OrderService.update_payment_status()` receives `payment_sta
 
 ---
 
-## Celery Task
+## Background Tasks
+
+### Order Maintenance
+
+```python
+# app/tasks/order_tasks.py
+
+@celery_app.task
+def cancel_abandoned_orders():
+    """
+    Finds orders stuck in 'pending_payment' for more than 30 minutes
+    and cancels them, which automatically releases their reserved stock.
+    Runs periodically via Celery Beat.
+    """
+    # 1. Query orders where status == PENDING_PAYMENT and created_at < now() - 30 minutes
+    # 2. For each order, call OrderService.cancel_order(order, reason="Abandoned checkout")
+```
+
+### Email Task
 
 ```python
 # app/tasks/email_tasks.py
@@ -136,6 +167,8 @@ def update_payment_status(self, order, payment_status, payment_id, payment_gatew
 ## Acceptance Criteria
 
 - [ ] Celery worker starts and connects to Redis
+- [ ] Celery Beat is configured and runs without errors
+- [ ] Abandoned orders task cancels orders older than 30 mins
 - [ ] When payment is marked as `paid`, an email task is enqueued
 - [ ] Email is sent to the user's email (authenticated order)
 - [ ] Email is sent to `guest_email` (guest order)

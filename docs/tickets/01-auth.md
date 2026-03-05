@@ -49,18 +49,16 @@ Table: users
 **Response 201:**
 ```json
 {
-  "data": {
-    "user": {
-      "id": 1,
-      "name": "Juan Pérez",
-      "email": "juan@example.com",
-      "created_at": "2026-03-05T12:00:00Z",
-      "updated_at": "2026-03-05T12:00:00Z"
-    },
-    "access_token": "eyJ...",
-    "refresh_token": "eyJ...",
-    "token_type": "bearer"
-  }
+  "user": {
+    "id": 1,
+    "name": "Juan Pérez",
+    "email": "juan@example.com",
+    "created_at": "2026-03-05T12:00:00Z",
+    "updated_at": "2026-03-05T12:00:00Z"
+  },
+  "access_token": "eyJ...",
+  "refresh_token": "eyJ...",
+  "token_type": "bearer"
 }
 ```
 
@@ -83,19 +81,17 @@ Table: users
 **Response 200:**
 ```json
 {
-  "data": {
-    "user": {
-      "id": 1,
-      "name": "Juan Pérez",
-      "email": "juan@example.com",
-      "is_admin": false,
-      "created_at": "2026-03-05T12:00:00Z",
-      "updated_at": "2026-03-05T12:00:00Z"
-    },
-    "access_token": "eyJ...",
-    "refresh_token": "eyJ...",
-    "token_type": "bearer"
-  }
+  "user": {
+    "id": 1,
+    "name": "Juan Pérez",
+    "email": "juan@example.com",
+    "is_admin": false,
+    "created_at": "2026-03-05T12:00:00Z",
+    "updated_at": "2026-03-05T12:00:00Z"
+  },
+  "access_token": "eyJ...",
+  "refresh_token": "eyJ...",
+  "token_type": "bearer"
 }
 ```
 
@@ -117,10 +113,8 @@ Table: users
 **Response 200:**
 ```json
 {
-  "data": {
-    "access_token": "eyJ...",
-    "token_type": "bearer"
-  }
+  "access_token": "eyJ...",
+  "token_type": "bearer"
 }
 ```
 
@@ -144,14 +138,12 @@ Table: users
 **Response 200:**
 ```json
 {
-  "data": {
-    "id": 1,
-    "name": "Juan Pérez",
-    "email": "juan@example.com",
-    "is_admin": false,
-    "created_at": "2026-03-05T12:00:00Z",
-    "updated_at": "2026-03-05T12:00:00Z"
-  }
+  "id": 1,
+  "name": "Juan Pérez",
+  "email": "juan@example.com",
+  "is_admin": false,
+  "created_at": "2026-03-05T12:00:00Z",
+  "updated_at": "2026-03-05T12:00:00Z"
 }
 ```
 

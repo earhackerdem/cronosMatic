@@ -34,6 +34,15 @@ Table: categories
 
 ---
 
+## Computed field: image_url
+
+In the **response schema** (Pydantic), include `image_url`:
+- If `image_path` is `null` → return `null`.
+- If `image_path` starts with `http` → return as-is.
+- Otherwise → return the full S3 URL (or concatenate with the storage base URL).
+
+---
+
 ## Public Endpoints
 
 ### GET /api/v1/categories
@@ -49,6 +58,7 @@ Table: categories
       "slug": "relojes-de-bolsillo",
       "description": "Description...",
       "image_path": "categories/abc.jpg",
+      "image_url": "https://s3.../categories/abc.jpg",
       "is_active": true,
       "created_at": "2026-03-05T12:00:00Z",
       "updated_at": "2026-03-05T12:00:00Z"
@@ -78,7 +88,8 @@ Table: categories
     "name": "Relojes de Bolsillo",
     "slug": "relojes-de-bolsillo",
     "description": "...",
-    "image_path": "...",
+    "image_path": "categories/abc.jpg",
+    "image_url": "https://s3.../categories/abc.jpg",
     "is_active": true,
     "created_at": "...",
     "updated_at": "..."
@@ -161,7 +172,8 @@ Table: categories
 **Response:** 204 No Content
 
 **Rules:**
-- Allows deleting categories even if they have associated products (current Laravel behavior).
+- Performs a soft delete: sets `is_active = false` instead of removing the record from the database.
+- This prevents foreign key constraints from failing in the `products` table while safely hiding the category.
 
 ---
 
@@ -176,3 +188,5 @@ Table: categories
 - [ ] Admin can create, view, update, and delete categories
 - [ ] Non-admin receives 403 on admin endpoints
 - [ ] Slug is unique in the DB
+- [ ] `image_url` is `null` when `image_path` is null
+- [ ] `image_url` returns the full URL when `image_path` exists

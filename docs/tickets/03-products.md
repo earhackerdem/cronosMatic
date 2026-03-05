@@ -116,23 +116,21 @@ In the **response schema** (Pydantic), include `image_url`:
 **Response 200:**
 ```json
 {
-  "data": {
-    "id": 1,
-    "category": { "id": 1, "name": "...", "slug": "..." },
-    "name": "Reloj Elegante",
-    "slug": "reloj-elegante",
-    "sku": "RE-001",
-    "description": "...",
-    "price": "1500.00",
-    "stock_quantity": 25,
-    "brand": "CronosMatic",
-    "movement_type": "Automatic",
-    "image_path": "products/abc.jpg",
-    "image_url": "https://s3.../products/abc.jpg",
-    "is_active": true,
-    "created_at": "...",
-    "updated_at": "..."
-  }
+  "id": 1,
+  "category": { "id": 1, "name": "...", "slug": "..." },
+  "name": "Reloj Elegante",
+  "slug": "reloj-elegante",
+  "sku": "RE-001",
+  "description": "...",
+  "price": "1500.00",
+  "stock_quantity": 25,
+  "brand": "CronosMatic",
+  "movement_type": "Automatic",
+  "image_path": "products/abc.jpg",
+  "image_url": "https://s3.../products/abc.jpg",
+  "is_active": true,
+  "created_at": "...",
+  "updated_at": "..."
 }
 ```
 
@@ -214,10 +212,8 @@ In the **response schema** (Pydantic), include `image_url`:
 **Response 201:**
 ```json
 {
-  "data": {
-    "path": "products/a1b2c3d4-uuid.jpg",
-    "url": "https://s3.amazonaws.com/bucket/products/a1b2c3d4-uuid.jpg"
-  }
+  "path": "products/a1b2c3d4-uuid.jpg",
+  "url": "https://s3.amazonaws.com/bucket/products/a1b2c3d4-uuid.jpg"
 }
 ```
 

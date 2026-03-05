@@ -75,29 +75,27 @@ Implement in the Python service layer (NOT as a DB trigger):
 
 **Response 200:**
 ```json
-{
-  "data": [
-    {
-      "id": 1,
-      "type": "shipping",
-      "first_name": "Juan",
-      "last_name": "Pérez",
-      "full_name": "Juan Pérez",
-      "company": "Acme Corp",
-      "address_line_1": "Av. Reforma 123",
-      "address_line_2": "Piso 5",
-      "city": "Ciudad de México",
-      "state": "CDMX",
-      "postal_code": "06600",
-      "country": "MX",
-      "phone": "+5215551234567",
-      "is_default": true,
-      "full_address": "Av. Reforma 123, Piso 5, Ciudad de México, CDMX 06600, MX",
-      "created_at": "...",
-      "updated_at": "..."
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "type": "shipping",
+    "first_name": "Juan",
+    "last_name": "Pérez",
+    "full_name": "Juan Pérez",
+    "company": "Acme Corp",
+    "address_line_1": "Av. Reforma 123",
+    "address_line_2": "Piso 5",
+    "city": "Ciudad de México",
+    "state": "CDMX",
+    "postal_code": "06600",
+    "country": "MX",
+    "phone": "+5215551234567",
+    "is_default": true,
+    "full_address": "Av. Reforma 123, Piso 5, Ciudad de México, CDMX 06600, MX",
+    "created_at": "...",
+    "updated_at": "..."
+  }
+]
 ```
 
 **Rules:**

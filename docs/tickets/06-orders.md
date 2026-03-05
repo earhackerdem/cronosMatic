@@ -156,33 +156,29 @@ Table: order_items
 **Response 201:**
 ```json
 {
-  "success": true,
-  "message": "Order created successfully",
-  "data": {
-    "order": {
-      "id": 1,
-      "order_number": "CM-2026-A1B2C3D4",
-      "status": "pending_payment",
-      "payment_status": "pending",
-      "subtotal_amount": "1400.00",
-      "shipping_cost": "100.00",
-      "total_amount": "1500.00",
-      "items": [
-        {
-          "id": 1,
-          "product_id": 5,
-          "product_name": "Reloj Elegante",
-          "quantity": 1,
-          "price_per_unit": "1400.00",
-          "total_price": "1400.00"
-        }
-      ],
-      "created_at": "..."
-    },
-    "payment": {
-      "method": "paypal",
-      "status": "pending"
-    }
+  "order": {
+    "id": 1,
+    "order_number": "CM-2026-A1B2C3D4",
+    "status": "pending_payment",
+    "payment_status": "pending",
+    "subtotal_amount": "1400.00",
+    "shipping_cost": "100.00",
+    "total_amount": "1500.00",
+    "items": [
+      {
+        "id": 1,
+        "product_id": 5,
+        "product_name": "Reloj Elegante",
+        "quantity": 1,
+        "price_per_unit": "1400.00",
+        "total_price": "1400.00"
+      }
+    ],
+    "created_at": "..."
+  },
+  "payment": {
+    "method": "paypal",
+    "status": "pending"
   }
 }
 ```
@@ -193,11 +189,12 @@ Table: order_items
 3. Validate stock for all items (with `FOR UPDATE`).
 4. If guest: create two records in `addresses` (shipping + billing) with `user_id = null`.
 5. If billing_address was not provided: use shipping_address.
-6. Create `Order` with `status = pending_payment`, `payment_status = pending`.
-7. Create `OrderItems` from `CartItems`. Copy `product.name` to `product_name`, `product.price` to `price_per_unit`.
-8. Decrement stock for each product.
-9. All within a DB transaction.
-10. **Do NOT clear the cart here.** The cart is cleared after successful payment (see Ticket 07).
+6. Set `shipping_cost` using the `DEFAULT_SHIPPING_COST` environment variable. `total_amount = subtotal_amount + shipping_cost`.
+7. Create `Order` with `status = pending_payment`, `payment_status = pending`.
+8. Create `OrderItems` from `CartItems`. Copy `product.name` to `product_name`, `product.price` to `price_per_unit`.
+9. Decrement stock for each product.
+10. All within a DB transaction.
+11. **Do NOT clear the cart here.** The cart is cleared after successful payment (see Ticket 07).
 
 **Errors:**
 - 422: empty cart, insufficient stock, address not found, invalid payment_method, guest_email required for guests.
@@ -234,6 +231,7 @@ Required methods:
   - Only if `status` is `pending_payment` or `processing`.
   - Restore stock for each OrderItem.
   - Append reason to the `notes` field.
+  - *Note: Abandoned orders in `pending_payment` status will be automatically cancelled by a Celery Beat background task to release reserved stock (see Ticket 08).*
 - `get_user_orders(user_id, page, size)` → paginated results
 - `get_order_by_number(order_number, user_id)` → Order or None
 - `generate_order_number()` → string (format CM-YYYY-XXXXXXXX, unique)
