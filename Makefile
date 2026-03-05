@@ -63,7 +63,7 @@ db-admin: ## Show pgAdmin connection info
 ##@ Tests
 
 test-back: ## Run backend tests
-	cd backend && uv run pytest
+	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" BACKEND_SECRET_KEY="$(BACKEND_SECRET_KEY)" uv run pytest
 
 test-front: ## Run frontend tests
 	cd frontend && npm run test:ci
