@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "CronosMatic Dev",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "cronosmatic",
+      "Username": "cronosmatic",
+      "SSLMode": "prefer",
+      "PassFile": "/tmp/pgpassfile"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 .DEFAULT_GOAL := help
+-include .env
 
 # ── Colors ───────────────────────────────────────────────
 YELLOW := \033[1;33m
@@ -41,10 +42,15 @@ clean: ## Stop services and remove volumes
 ##@ Database
 
 db-migrate: ## Run Alembic migrations
-	cd backend && uv run alembic upgrade head
+	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)" uv run alembic upgrade head
 
 db-revision: ## Create new migration (usage: make db-revision MSG="description")
-	cd backend && uv run alembic revision --autogenerate -m "$(MSG)"
+	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)" uv run alembic revision --autogenerate -m "$(MSG)"
+
+db-admin: ## Show pgAdmin connection info
+	@echo "pgAdmin: http://localhost:$(PGADMIN_PORT)"
+	@echo "Email: $(PGADMIN_EMAIL)"
+	@echo "Password: $(PGADMIN_PASSWORD)"
 
 ##@ Tests
 

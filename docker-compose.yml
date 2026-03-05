@@ -19,6 +19,34 @@ services:
     networks:
       - cronosmatic
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    user: root
+    entrypoint: >
+      /bin/sh -c "
+      cp /pgadmin4/pgpass /tmp/pgpassfile &&
+      chmod 600 /tmp/pgpassfile &&
+      chown 5050:5050 /tmp/pgpassfile &&
+      /entrypoint.sh
+      "
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@cronosmatic.dev}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_LISTEN_PORT: 5050
+      PGPASSFILE: /tmp/pgpassfile
+    ports:
+      - "${PGADMIN_PORT:-5050}:5050"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - ./docker/pgadmin/pgpass:/pgadmin4/pgpass:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cronosmatic
+
   backend:
     build: ./backend
     ports:
@@ -45,6 +73,7 @@ services:
 
 volumes:
   db_data:
+  pgadmin_data:
 
 networks:
   cronosmatic:
