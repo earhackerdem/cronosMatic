@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
 
@@ -37,3 +38,4 @@ async def test_status_returns_ok(client):
     assert data["status"] == "ok"
     assert data["message"] == "API is running"
     assert "timestamp" in data
+    datetime.fromisoformat(data["timestamp"])

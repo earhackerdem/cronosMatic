@@ -4,14 +4,17 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     debug: bool = False
-    secret_key: str = Field(description="Secret key for signing. Set via BACKEND_SECRET_KEY.")
-    cors_origins: str = "http://localhost:5173,http://localhost:4200"
+    secret_key: str = Field(
+        description="Secret key for signing. Set via BACKEND_SECRET_KEY."
+    )
+    cors_origins: str = (
+        "http://localhost:5173,http://localhost:4200"  # 5173=Vite, 4200=legacy fallback
+    )
 
     database_url: str = Field(
         validation_alias="DATABASE_URL",
         description="PostgreSQL connection string. Set via DATABASE_URL env var.",
     )
-
 
     model_config = {"env_prefix": "BACKEND_"}
 

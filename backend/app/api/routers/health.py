@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from sqlalchemy import text
 
 from app.db.engine import engine
+from app.schemas.health import StatusResponse
 
 router = APIRouter()
 
@@ -21,7 +22,7 @@ async def health() -> dict:
     return result
 
 
-@router.get("/status")
+@router.get("/status", response_model=StatusResponse)
 async def status() -> dict:
     return {
         "status": "ok",
