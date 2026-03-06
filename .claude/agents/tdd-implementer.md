@@ -28,7 +28,7 @@ Always follow this strict order:
 - Write tests for domain entity construction, validation, default values
 - Create pure Python dataclasses in `backend/app/domain/<entity>/`
 - Define repository interface as a Python `Protocol` in the domain layer
-- Run tests: `cd backend && DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/cronosmatic" BACKEND_SECRET_KEY="test-secret" uv run pytest tests/<relevant_test_file>.py -v`
+- Run tests: `make test-back FILE=tests/<relevant_test_file>.py ARGS="-v"`
 - **STOP if tests fail. Fix until green.**
 
 ### Layer 2: SQLAlchemy Models + Migration
@@ -70,9 +70,9 @@ Always follow this strict order:
 - Run tests. **STOP if tests fail. Fix until green.**
 
 ### Final: Full Test Suite
-- Run all tests: `cd backend && DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/cronosmatic" BACKEND_SECRET_KEY="test-secret" uv run pytest -v`
+- Run all tests: `make test-back ARGS="-v"`
 - Ensure no regressions
-- Run linter: `cd backend && uv run ruff check .`
+- Run linter: `make lint-back`
 
 ## Strict Conventions
 
@@ -92,15 +92,23 @@ Always follow this strict order:
 4. **GATE**: Never proceed to the next layer until all current layer tests are green.
 5. **REPORT**: After each layer, report test results clearly (passed/failed/count).
 
-## Test Execution Command
+## Test Execution Commands
 
 ```bash
-cd backend && DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/cronosmatic" BACKEND_SECRET_KEY="test-secret" uv run pytest tests/<test_file>.py -v
-```
+# Run tests for a specific file
+make test-back FILE=tests/<test_file>.py ARGS="-v"
 
-For a single test:
-```bash
-cd backend && DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/cronosmatic" BACKEND_SECRET_KEY="test-secret" uv run pytest tests/<test_file>.py -k <test_name> -v
+# Run a single test
+make test-back FILE=tests/<test_file>.py ARGS="-k <test_name> -v"
+
+# Run all tests
+make test-back ARGS="-v"
+
+# Run linter
+make lint-back
+
+# Run formatter
+make format-back
 ```
 
 ## Error Handling Pattern

@@ -50,10 +50,10 @@ clean: ## Stop services and remove volumes
 ##@ Database
 
 db-migrate: ## Run Alembic migrations
-	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" BACKEND_SECRET_KEY="$(BACKEND_SECRET_KEY)" BACKEND_JWT_SECRET_KEY="$(BACKEND_JWT_SECRET_KEY)" uv run alembic upgrade head
+	cd backend && $(BACK_ENV) uv run alembic upgrade head
 
 db-revision: ## Create new migration (usage: make db-revision MSG="description")
-	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" BACKEND_SECRET_KEY="$(BACKEND_SECRET_KEY)" BACKEND_JWT_SECRET_KEY="$(BACKEND_JWT_SECRET_KEY)" uv run alembic revision --autogenerate -m "$(MSG)"
+	cd backend && $(BACK_ENV) uv run alembic revision --autogenerate -m "$(MSG)"
 
 db-admin: ## Show pgAdmin connection info
 	@echo "pgAdmin: http://localhost:$(PGADMIN_PORT)"
@@ -62,8 +62,20 @@ db-admin: ## Show pgAdmin connection info
 
 ##@ Tests
 
-test-back: ## Run backend tests
-	cd backend && DATABASE_URL="postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" BACKEND_SECRET_KEY="$(BACKEND_SECRET_KEY)" BACKEND_JWT_SECRET_KEY="$(BACKEND_JWT_SECRET_KEY)" uv run pytest
+DB_URL := postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+BACK_ENV := DATABASE_URL="$(DB_URL)" BACKEND_SECRET_KEY="$(BACKEND_SECRET_KEY)" BACKEND_JWT_SECRET_KEY="$(BACKEND_JWT_SECRET_KEY)"
+
+test-back: ## Run backend tests (FILE=tests/file.py, ARGS="-k test_name -v")
+	cd backend && $(BACK_ENV) uv run pytest $(FILE) $(ARGS)
+
+test-back-cov: ## Run backend tests with coverage
+	cd backend && $(BACK_ENV) uv run pytest --cov=app --cov-report=term-missing $(FILE) $(ARGS)
+
+lint-back: ## Run ruff check + format check
+	cd backend && uv run ruff check . && uv run ruff format --check .
+
+format-back: ## Run ruff format
+	cd backend && uv run ruff format .
 
 test-front: ## Run frontend tests
 	cd frontend && npm run test:ci

@@ -124,7 +124,7 @@ All tests follow TDD — write tests BEFORE implementation at each phase.
 - [ ] [Criterion from ticket spec]
 - [ ] [Criterion]
 - [ ] All tests pass (`make test-back`)
-- [ ] Linting passes (`cd backend && uv run ruff check .`)
+- [ ] Linting passes (`make lint-back`)
 - [ ] Infrastructure gaps marked resolved in `docs/infra-gaps.md`
 ```
 
