@@ -22,6 +22,10 @@ Each should be resolved **during the ticket that introduces the dependency**.
 - ~~Add `passlib[bcrypt]`, `python-jose[cryptography]` to `pyproject.toml`~~
   - Added via `uv add`; also added `email-validator` for Pydantic EmailStr
 
+## Ticket 02 (Categories) ✅ RESOLVED
+- ~~Add `BACKEND_STORAGE_BASE_URL` to `config.py`, `.env.example`, and `docker-compose.yml`~~
+  - Added to Settings, .env.example, and docker-compose.yml backend service env block
+
 ## Ticket 03 (Products + Images)
 - Add `boto3` to `pyproject.toml`
 - Add `AWS_*` env vars to `.env.example` and `docker-compose.yml`
