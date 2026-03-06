@@ -1,9 +1,7 @@
+from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
-import pytest
 
-
-@pytest.mark.asyncio
 async def test_health_returns_ok_with_db(client):
     mock_conn = AsyncMock()
     mock_conn.execute = AsyncMock()
@@ -13,7 +11,7 @@ async def test_health_returns_ok_with_db(client):
 
     with patch("app.api.routers.health.engine") as mock_engine:
         mock_engine.connect.return_value = mock_connect
-        response = await client.get("/health")
+        response = await client.get("/api/v1/health")
 
     assert response.status_code == 200
     data = response.json()
@@ -21,14 +19,23 @@ async def test_health_returns_ok_with_db(client):
     assert data["database"] == "connected"
 
 
-@pytest.mark.asyncio
 async def test_health_returns_degraded_when_db_unavailable(client):
     with patch("app.api.routers.health.engine") as mock_engine:
         mock_engine.connect.side_effect = ConnectionRefusedError("DB down")
-        response = await client.get("/health")
-
+        response = await client.get("/api/v1/health")
 
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "degraded"
     assert data["database"] == "unavailable"
+
+
+async def test_status_returns_ok(client):
+    response = await client.get("/api/v1/status")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["message"] == "API is running"
+    assert "timestamp" in data
+    datetime.fromisoformat(data["timestamp"])

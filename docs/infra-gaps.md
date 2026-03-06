@@ -3,10 +3,16 @@
 These gaps exist between tickets and the actual Docker/env/config setup.
 Each should be resolved **during the ticket that introduces the dependency**.
 
-## Ticket 00 (Project Setup)
-- Health endpoint is at `GET /health`, ticket says `GET /api/v1/status` — align during setup
-- Ticket says `alembic/` directory but actual project uses `migrations/` — ticket must match reality
-- CORS: actual code uses `allow_headers=["*"]` and `allow_credentials=True`, ticket says restricted headers and `credentials: false` — decide during setup
+## Ticket 00 (Project Setup) ✅ RESOLVED
+- ~~Health endpoint is at `GET /health`, ticket says `GET /api/v1/status` — align during setup~~
+  - Added `/api/v1` prefix to central router; added `GET /status` endpoint
+- ~~Ticket says `alembic/` directory but actual project uses `migrations/` — ticket must match reality~~
+  - Resolved: renamed to `alembic/` (Python/Alembic convention)
+- ~~CORS: actual code uses `allow_headers=["*"]` and `allow_credentials=True`, ticket says restricted headers and `credentials: false` — decide during setup~~
+  - CORS aligned: `credentials=False`, explicit methods and headers
+- ~~`.env.example` says "Angular", tickets say "React"~~
+  - Fixed to "React"; CORS origins include both Vite (5173) and legacy (4200) ports
+- Redis/Celery deferred to Tickets 04/08
 
 ## Ticket 01 (Auth)
 - `Settings` class uses `env_prefix = "BACKEND_"`. JWT vars (`JWT_SECRET_KEY`, etc.) need either:
@@ -37,8 +43,3 @@ Each should be resolved **during the ticket that introduces the dependency**.
 - Add `celery`, `redis`, `fastapi-mail` to `pyproject.toml`
 - Add `MAIL_*` env vars to `.env.example` and compose
 - Update `Makefile` with celery worker/beat commands
-
-## Frontend Framework
-- `.env.example` says "Angular", tickets say "React"
-- Actual frontend uses port 4200 (Angular default) and nginx
-- Clarify with the actual frontend code — resolve on first ticket that references frontend

@@ -1,7 +1,10 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter
 from sqlalchemy import text
 
 from app.db.engine import engine
+from app.schemas.health import StatusResponse
 
 router = APIRouter()
 
@@ -17,3 +20,12 @@ async def health() -> dict:
         result["status"] = "degraded"
         result["database"] = "unavailable"
     return result
+
+
+@router.get("/status", response_model=StatusResponse)
+async def status() -> dict:
+    return {
+        "status": "ok",
+        "message": "API is running",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }

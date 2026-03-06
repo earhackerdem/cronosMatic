@@ -61,7 +61,7 @@ async def get_category_service(session=Depends(get_db_session)) -> CategoryServi
 - `app/db/engine.py` — Async engine + session factory + `get_db_session` dependency.
 - `app/main.py` — FastAPI app, CORS middleware, lifespan (engine dispose).
 - `app/api/main.py` — Central router aggregation.
-- Migrations dir: `backend/migrations/` (NOT `alembic/`).
+- Migrations dir: `backend/alembic/`.
 - Package manager: `uv` (not pip). Use `uv add <package>` to add dependencies.
 - Tests use `pytest-asyncio` with `asyncio_mode = "auto"` and `httpx.AsyncClient` with `ASGITransport`.
 
