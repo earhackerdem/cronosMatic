@@ -64,9 +64,7 @@ class CategoryRepository(CategoryRepositoryInterface):
         model = result.scalar_one_or_none()
         return self._to_domain(model) if model else None
 
-    async def list_active(
-        self, offset: int, limit: int
-    ) -> tuple[list[Category], int]:
+    async def list_active(self, offset: int, limit: int) -> tuple[list[Category], int]:
         count_result = await self.session.execute(
             select(func.count()).where(CategoryModel.is_active.is_(True))
         )
@@ -81,9 +79,7 @@ class CategoryRepository(CategoryRepositoryInterface):
         models = result.scalars().all()
         return [self._to_domain(m) for m in models], total
 
-    async def list_all(
-        self, offset: int, limit: int
-    ) -> tuple[list[Category], int]:
+    async def list_all(self, offset: int, limit: int) -> tuple[list[Category], int]:
         count_result = await self.session.execute(select(func.count(CategoryModel.id)))
         total = count_result.scalar_one()
 

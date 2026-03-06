@@ -1,6 +1,6 @@
 """Unit tests for the Category domain entity and repository protocol."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from app.domain.category.entity import Category
 
@@ -20,7 +20,7 @@ def test_category_minimal_construction():
 
 def test_category_full_construction():
     """Category accepts all optional fields."""
-    now = datetime.utcnow()
+    now = datetime.now(tz=UTC)
     cat = Category(
         id=1,
         name="Dress Watches",
@@ -76,6 +76,4 @@ def test_category_repository_protocol_has_required_methods():
         "set_inactive",
     ]
     for method in required:
-        assert hasattr(CategoryRepositoryInterface, method), (
-            f"Missing method: {method}"
-        )
+        assert hasattr(CategoryRepositoryInterface, method), f"Missing method: {method}"

@@ -130,7 +130,11 @@ async def test_create_category_success():
 
     service = CategoryService(repo)
     result = await service.create_category(
-        name="Test Cat", slug="test-cat", description=None, image_path=None, is_active=True
+        name="Test Cat",
+        slug="test-cat",
+        description=None,
+        image_path=None,
+        is_active=True,
     )
 
     assert result is created
@@ -144,7 +148,11 @@ async def test_create_category_raises_conflict_on_duplicate_slug():
     service = CategoryService(repo)
     with pytest.raises(CategoryConflictError):
         await service.create_category(
-            name="Dup", slug="test-cat", description=None, image_path=None, is_active=True
+            name="Dup",
+            slug="test-cat",
+            description=None,
+            image_path=None,
+            is_active=True,
         )
 
     repo.create.assert_not_called()
@@ -158,7 +166,11 @@ async def test_create_category_wraps_integrity_error():
     service = CategoryService(repo)
     with pytest.raises(CategoryConflictError):
         await service.create_category(
-            name="Dup", slug="test-cat", description=None, image_path=None, is_active=True
+            name="Dup",
+            slug="test-cat",
+            description=None,
+            image_path=None,
+            is_active=True,
         )
 
 

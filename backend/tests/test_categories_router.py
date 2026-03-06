@@ -214,9 +214,7 @@ async def test_get_category_by_slug_image_url_passthrough_when_http(
     )
     resp = await cat_client.get("/api/v1/categories/http-img")
     assert resp.status_code == 200
-    assert (
-        resp.json()["category"]["image_url"] == "https://cdn.example.com/img.jpg"
-    )
+    assert resp.json()["category"]["image_url"] == "https://cdn.example.com/img.jpg"
 
 
 async def test_get_category_by_slug_image_url_prepends_storage_base_url(
@@ -263,9 +261,7 @@ async def test_admin_list_all_categories_default_size_is_15(cat_client, admin_to
     assert resp.json()["size"] == 15
 
 
-async def test_admin_list_categories_returns_403_for_non_admin(
-    cat_client, user_token
-):
+async def test_admin_list_categories_returns_403_for_non_admin(cat_client, user_token):
     resp = await cat_client.get(
         "/api/v1/admin/categories",
         headers={"Authorization": f"Bearer {user_token}"},

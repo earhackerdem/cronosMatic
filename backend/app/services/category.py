@@ -12,15 +12,11 @@ class CategoryService:
     def __init__(self, repository: CategoryRepositoryInterface):
         self.repository = repository
 
-    async def list_active(
-        self, page: int, size: int
-    ) -> tuple[list[Category], int]:
+    async def list_active(self, page: int, size: int) -> tuple[list[Category], int]:
         offset = (page - 1) * size
         return await self.repository.list_active(offset=offset, limit=size)
 
-    async def list_all_admin(
-        self, page: int, size: int
-    ) -> tuple[list[Category], int]:
+    async def list_all_admin(self, page: int, size: int) -> tuple[list[Category], int]:
         offset = (page - 1) * size
         return await self.repository.list_all(offset=offset, limit=size)
 
@@ -53,9 +49,7 @@ class CategoryService:
         except IntegrityError:
             raise CategoryConflictError(f"Category with slug '{slug}' already exists")
 
-    async def update_category(
-        self, category_id: int, data: dict
-    ) -> Category | None:
+    async def update_category(self, category_id: int, data: dict) -> Category | None:
         category = await self.repository.get_by_id(category_id)
         if not category:
             return None

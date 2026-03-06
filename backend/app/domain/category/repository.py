@@ -20,15 +20,11 @@ class CategoryRepositoryInterface(Protocol):
         """Retrieves an active category given its slug."""
         ...
 
-    async def list_active(
-        self, offset: int, limit: int
-    ) -> tuple[list[Category], int]:
+    async def list_active(self, offset: int, limit: int) -> tuple[list[Category], int]:
         """Returns active categories with total count."""
         ...
 
-    async def list_all(
-        self, offset: int, limit: int
-    ) -> tuple[list[Category], int]:
+    async def list_all(self, offset: int, limit: int) -> tuple[list[Category], int]:
         """Returns all categories (admin, no filter) with total count."""
         ...
 
