@@ -1,41 +1,75 @@
-import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, computed_field
+
+from app.config import settings
 
 
 class CategoryBase(BaseModel):
-    name: dict[str, str] = Field(..., description="i18n category name")
-    slug: str = Field(..., max_length=255, description="URL-friendly slug")
-    description: dict[str, str] | None = Field(
-        default=None, description="i18n category description"
-    )
+    name: str
+    slug: str
+    description: str | None = None
+    image_path: str | None = None
+    is_active: bool = True
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class CategoryCreate(CategoryBase):
+    """All base fields; name and slug are required (no default)."""
+
     pass
 
 
 class CategoryUpdate(BaseModel):
-    """PATCH - all fields optional."""
+    """Partial update — all fields optional."""
 
-    name: dict[str, str] | None = None
-    slug: str | None = Field(default=None, max_length=255)
-    description: dict[str, str] | None = None
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    image_path: str | None = None
+    is_active: bool | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
-    @field_validator("name", "slug", mode="before")
-    @classmethod
-    def reject_null(cls, v: object, info: object) -> object:
-        if v is None:
-            raise ValueError(f"{info.field_name} cannot be null")
-        return v
-
 
 class CategoryResponse(CategoryBase):
-    id: uuid.UUID
+    id: int
     created_at: datetime
     updated_at: datetime
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def image_url(self) -> str | None:
+        if self.image_path is None:
+            return None
+        if self.image_path.startswith("http"):
+            return self.image_path
+        base = settings.storage_base_url.rstrip("/")
+        return f"{base}/{self.image_path}" if base else self.image_path
+
+
+class PaginatedCategoriesResponse(BaseModel):
+    items: list[CategoryResponse]
+    total: int
+    page: int
+    pages: int
+    size: int
+
+
+class PaginatedProductsStub(BaseModel):
+    """Stub for the product list embedded in a category detail response.
+
+    Products are implemented in Ticket 03; this returns empty pagination.
+    """
+
+    items: list = []
+    total: int = 0
+    page: int
+    pages: int = 0
+    size: int
+
+
+class CategoryDetailResponse(BaseModel):
+    category: CategoryResponse
+    products: PaginatedProductsStub

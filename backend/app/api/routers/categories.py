@@ -1,14 +1,22 @@
-import uuid
+import math
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 
+from app.api.deps import require_admin
 from app.db.engine import get_db_session
 from app.repositories.category_repository import CategoryRepository
-from app.schemas.category import CategoryCreate, CategoryResponse, CategoryUpdate
+from app.schemas.category import (
+    CategoryCreate,
+    CategoryDetailResponse,
+    CategoryResponse,
+    CategoryUpdate,
+    PaginatedCategoriesResponse,
+    PaginatedProductsStub,
+)
 from app.services.category import CategoryConflictError, CategoryService
 
-router = APIRouter(prefix="/categories", tags=["categories"])
+# ─── Shared DI ───────────────────────────────────────────────────────────────
 
 
 async def get_category_service(
@@ -18,91 +26,113 @@ async def get_category_service(
     return CategoryService(repository)
 
 
-@router.get("", response_model=list[CategoryResponse])
+# ─── Public Router ───────────────────────────────────────────────────────────
+
+router = APIRouter(prefix="/categories", tags=["categories"])
+
+
+@router.get("", response_model=PaginatedCategoriesResponse)
 async def list_categories(
     service: Annotated[CategoryService, Depends(get_category_service)],
+    page: int = 1,
+    size: int = 10,
 ):
-    categories = await service.get_all_categories()
-    return categories
+    items, total = await service.list_active(page=page, size=size)
+    pages = math.ceil(total / size) if size > 0 else 0
+    return PaginatedCategoriesResponse(
+        items=items, total=total, page=page, pages=pages, size=size
+    )
 
 
-@router.get("/{category_id}", response_model=CategoryResponse)
-async def get_category(
-    category_id: uuid.UUID,
-    service: Annotated[CategoryService, Depends(get_category_service)],
-):
-    category = await service.get_category(category_id)
-    if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return category
-
-
-@router.get("/slug/{slug}", response_model=CategoryResponse)
+@router.get("/{slug}", response_model=CategoryDetailResponse)
 async def get_category_by_slug(
     slug: str,
     service: Annotated[CategoryService, Depends(get_category_service)],
+    page: int = 1,
+    size: int = 10,
 ):
-    category = await service.get_category_by_slug(slug)
+    category = await service.get_active_by_slug(slug)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return category
+        raise HTTPException(status_code=404, detail="Category not found.")
+
+    products_stub = PaginatedProductsStub(page=page, size=size)
+    return CategoryDetailResponse(category=category, products=products_stub)
 
 
-@router.post("", response_model=CategoryResponse, status_code=201)
+# ─── Admin Router ─────────────────────────────────────────────────────────────
+
+admin_router = APIRouter(
+    prefix="/admin/categories",
+    tags=["admin", "categories"],
+    dependencies=[Depends(require_admin)],
+)
+
+
+@admin_router.get("", response_model=PaginatedCategoriesResponse)
+async def list_categories_admin(
+    service: Annotated[CategoryService, Depends(get_category_service)],
+    page: int = 1,
+    size: int = 15,
+):
+    items, total = await service.list_all_admin(page=page, size=size)
+    pages = math.ceil(total / size) if size > 0 else 0
+    return PaginatedCategoriesResponse(
+        items=items, total=total, page=page, pages=pages, size=size
+    )
+
+
+@admin_router.post("", response_model=CategoryResponse, status_code=201)
 async def create_category(
     body: CategoryCreate,
     service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     try:
         category = await service.create_category(
-            name_i18n=body.name, slug=body.slug, description_i18n=body.description
+            name=body.name,
+            slug=body.slug,
+            description=body.description,
+            image_path=body.image_path,
+            is_active=body.is_active,
         )
     except CategoryConflictError as e:
         raise HTTPException(status_code=409, detail=str(e))
     return category
 
 
-@router.put("/{category_id}", response_model=CategoryResponse)
-async def replace_category(
-    category_id: uuid.UUID,
-    body: CategoryCreate,
+@admin_router.get("/{category_id}", response_model=CategoryResponse)
+async def get_category_admin(
+    category_id: int,
     service: Annotated[CategoryService, Depends(get_category_service)],
 ):
-    try:
-        category = await service.replace_category(
-            category_id=category_id,
-            name_i18n=body.name,
-            slug=body.slug,
-            description_i18n=body.description,
-        )
-    except CategoryConflictError as e:
-        raise HTTPException(status_code=409, detail=str(e))
+    category = await service.get_by_id(category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(status_code=404, detail="Category not found.")
     return category
 
 
-@router.patch("/{category_id}", response_model=CategoryResponse)
+@admin_router.put("/{category_id}", response_model=CategoryResponse)
 async def update_category(
-    category_id: uuid.UUID,
+    category_id: int,
     body: CategoryUpdate,
     service: Annotated[CategoryService, Depends(get_category_service)],
 ):
+    # Build a dict of only the fields that were explicitly provided
+    data = body.model_dump(exclude_unset=True)
     try:
-        category = await service.update_category(category_id=category_id, data=body)
+        category = await service.update_category(category_id, data)
     except CategoryConflictError as e:
         raise HTTPException(status_code=409, detail=str(e))
     if not category:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(status_code=404, detail="Category not found.")
     return category
 
 
-@router.delete("/{category_id}", status_code=204)
+@admin_router.delete("/{category_id}", status_code=204)
 async def delete_category(
-    category_id: uuid.UUID,
+    category_id: int,
     service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     deleted = await service.delete_category(category_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="Category not found")
+        raise HTTPException(status_code=404, detail="Category not found.")
     return Response(status_code=204)
