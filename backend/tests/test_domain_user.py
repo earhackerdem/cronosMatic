@@ -1,4 +1,5 @@
 """Tests for User domain entity and repository interface."""
+
 from datetime import datetime
 
 from app.domain.user.entity import User
@@ -40,6 +41,7 @@ def test_user_entity_with_all_fields():
 def test_user_entity_is_dataclass():
     """User is a plain dataclass, no framework dependencies."""
     import dataclasses
+
     assert dataclasses.is_dataclass(User)
 
 
@@ -53,8 +55,12 @@ def test_user_repository_interface_is_protocol():
 def test_user_repository_interface_method_signatures():
     """Verify Protocol method names exist (duck-typing check)."""
     import inspect
+
     methods = [
-        name for name, _ in inspect.getmembers(UserRepositoryInterface, predicate=inspect.isfunction)
+        name
+        for name, _ in inspect.getmembers(
+            UserRepositoryInterface, predicate=inspect.isfunction
+        )
     ]
     assert "create" in methods
     assert "get_by_id" in methods

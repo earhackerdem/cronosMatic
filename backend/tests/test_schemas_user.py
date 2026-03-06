@@ -1,4 +1,5 @@
 """Tests for user-related Pydantic schemas."""
+
 from datetime import datetime
 
 import pytest
@@ -16,6 +17,7 @@ from app.schemas.user import (
 
 
 # ─── RegisterRequest ──────────────────────────────────────────────────────────
+
 
 def test_register_request_valid():
     data = RegisterRequest(
@@ -62,6 +64,7 @@ def test_register_request_invalid_email_raises():
 
 # ─── LoginRequest ─────────────────────────────────────────────────────────────
 
+
 def test_login_request_valid():
     data = LoginRequest(email="bob@example.com", password="anypass")
     assert data.email == "bob@example.com"
@@ -75,12 +78,14 @@ def test_login_request_invalid_email_raises():
 
 # ─── RefreshRequest ───────────────────────────────────────────────────────────
 
+
 def test_refresh_request_valid():
     data = RefreshRequest(refresh_token="some.jwt.token")
     assert data.refresh_token == "some.jwt.token"
 
 
 # ─── UserResponse ─────────────────────────────────────────────────────────────
+
 
 def test_user_response_from_attributes():
     now = datetime.now()
@@ -101,11 +106,16 @@ def test_user_response_from_attributes():
 
 # ─── AuthResponse ─────────────────────────────────────────────────────────────
 
+
 def test_auth_response_token_type_default():
     now = datetime.now()
     user_resp = UserResponse(
-        id=1, name="Eve", email="eve@example.com",
-        is_admin=False, created_at=now, updated_at=now
+        id=1,
+        name="Eve",
+        email="eve@example.com",
+        is_admin=False,
+        created_at=now,
+        updated_at=now,
     )
     auth_resp = AuthResponse(
         user=user_resp,
@@ -117,6 +127,7 @@ def test_auth_response_token_type_default():
 
 # ─── TokenResponse ────────────────────────────────────────────────────────────
 
+
 def test_token_response_has_token_type():
     resp = TokenResponse(access_token="tok")
     assert resp.token_type == "bearer"
@@ -124,11 +135,16 @@ def test_token_response_has_token_type():
 
 # ─── AuthStatusResponse ───────────────────────────────────────────────────────
 
+
 def test_auth_status_response_valid():
     now = datetime.now()
     user_resp = UserResponse(
-        id=1, name="Eve", email="eve@example.com",
-        is_admin=False, created_at=now, updated_at=now
+        id=1,
+        name="Eve",
+        email="eve@example.com",
+        is_admin=False,
+        created_at=now,
+        updated_at=now,
     )
     status_resp = AuthStatusResponse(
         status="authenticated",

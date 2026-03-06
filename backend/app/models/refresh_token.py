@@ -14,7 +14,9 @@ class RefreshTokenModel(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     token_jti: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
     revoked_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True, default=None
     )

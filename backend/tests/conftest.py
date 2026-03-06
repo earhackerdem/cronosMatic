@@ -6,6 +6,7 @@ Key design decisions:
 - Router integration tests override get_db_session via app.dependency_overrides
   to use a per-test engine+session, ensuring isolation AND no event loop conflicts.
 """
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text

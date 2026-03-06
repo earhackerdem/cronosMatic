@@ -1,4 +1,5 @@
 """Integration tests for RefreshTokenRepository against a real database."""
+
 from datetime import datetime, timedelta, timezone
 
 

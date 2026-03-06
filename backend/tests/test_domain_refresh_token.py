@@ -1,4 +1,5 @@
 """Tests for RefreshToken domain entity and repository interface."""
+
 import inspect
 from datetime import datetime
 
@@ -39,12 +40,16 @@ def test_refresh_token_entity_with_all_fields():
 
 def test_refresh_token_entity_is_dataclass():
     import dataclasses
+
     assert dataclasses.is_dataclass(RefreshToken)
 
 
 def test_refresh_token_repository_interface_method_signatures():
     methods = [
-        name for name, _ in inspect.getmembers(RefreshTokenRepositoryInterface, predicate=inspect.isfunction)
+        name
+        for name, _ in inspect.getmembers(
+            RefreshTokenRepositoryInterface, predicate=inspect.isfunction
+        )
     ]
     assert "create" in methods
     assert "get_by_jti" in methods

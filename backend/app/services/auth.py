@@ -70,12 +70,16 @@ class AuthService:
             "jti": jti,
             "exp": expire,
         }
-        token_str = jwt.encode(payload, self.settings.jwt_secret_key, algorithm=ALGORITHM)
+        token_str = jwt.encode(
+            payload, self.settings.jwt_secret_key, algorithm=ALGORITHM
+        )
         return token_str, jti
 
     def decode_access_token(self, token: str) -> dict:
         try:
-            payload = jwt.decode(token, self.settings.jwt_secret_key, algorithms=[ALGORITHM])
+            payload = jwt.decode(
+                token, self.settings.jwt_secret_key, algorithms=[ALGORITHM]
+            )
         except JWTError:
             raise InvalidTokenError("Invalid or expired access token.")
         if payload.get("type") != "access":
@@ -112,9 +116,7 @@ class AuthService:
 
         return created_user, access_token, refresh_token_str
 
-    async def login(
-        self, email: str, password: str
-    ) -> tuple[User, str, str]:
+    async def login(self, email: str, password: str) -> tuple[User, str, str]:
         user = await self.user_repo.get_by_email(email)
         if not user or not self.verify_password(password, user.hashed_password):
             raise InvalidCredentialsError("The provided credentials are incorrect.")

@@ -20,7 +20,7 @@ async def get_category_service(
 
 @router.get("", response_model=list[CategoryResponse])
 async def list_categories(
-    service: Annotated[CategoryService, Depends(get_category_service)]
+    service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     categories = await service.get_all_categories()
     return categories

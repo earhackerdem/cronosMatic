@@ -1,4 +1,5 @@
 """Tests for UserModel and RefreshTokenModel ORM models."""
+
 from app.models.user import UserModel
 from app.models.refresh_token import RefreshTokenModel
 
@@ -21,6 +22,7 @@ def test_user_model_tablename():
 
 def test_refresh_token_model_instantiation():
     from datetime import datetime
+
     expires = datetime.now()
     token = RefreshTokenModel(user_id=1, token_jti="some-jti", expires_at=expires)
     assert token.user_id == 1

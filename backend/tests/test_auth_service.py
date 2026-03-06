@@ -1,4 +1,5 @@
 """Tests for AuthService with mocked repositories."""
+
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock
 
@@ -25,6 +26,7 @@ def make_auth_service(user_repo=None, refresh_token_repo=None):
 
 # ─── Password hashing ─────────────────────────────────────────────────────────
 
+
 def test_hash_password_returns_string():
     service = make_auth_service()
     hashed = service.hash_password("mysecret")
@@ -46,6 +48,7 @@ def test_verify_password_wrong():
 
 # ─── Token creation ────────────────────────────────────────────────────────────
 
+
 def test_create_access_token_returns_str():
     service = make_auth_service()
     user = User(id=1, name="Alice", email="alice@test.com", hashed_password="x")
@@ -55,8 +58,11 @@ def test_create_access_token_returns_str():
 
 def test_create_access_token_contains_user_info():
     from jose import jwt
+
     service = make_auth_service()
-    user = User(id=7, name="Bob", email="bob@test.com", hashed_password="x", is_admin=True)
+    user = User(
+        id=7, name="Bob", email="bob@test.com", hashed_password="x", is_admin=True
+    )
     token = service.create_access_token(user)
     payload = jwt.decode(token, settings.jwt_secret_key, algorithms=["HS256"])
     # sub is stored as string in JWT (python-jose requirement), converted to int by decode_access_token
@@ -77,6 +83,7 @@ def test_create_refresh_token_returns_tuple():
 
 def test_create_refresh_token_contains_type_and_jti():
     from jose import jwt
+
     service = make_auth_service()
     user = User(id=3, name="Carol", email="carol@test.com", hashed_password="x")
     token_str, jti = service.create_refresh_token(user)
@@ -88,6 +95,7 @@ def test_create_refresh_token_contains_type_and_jti():
 
 
 # ─── decode_access_token ───────────────────────────────────────────────────────
+
 
 def test_decode_access_token_valid():
     service = make_auth_service()
@@ -115,12 +123,15 @@ def test_decode_access_token_wrong_type_raises():
 
 # ─── register ─────────────────────────────────────────────────────────────────
 
+
 async def test_register_creates_user_and_returns_tokens():
     user_repo = AsyncMock()
     rt_repo = AsyncMock()
 
     user_repo.get_by_email.return_value = None
-    created_user = User(id=1, name="Alice", email="alice@test.com", hashed_password="hashed")
+    created_user = User(
+        id=1, name="Alice", email="alice@test.com", hashed_password="hashed"
+    )
     user_repo.create.return_value = created_user
 
     expires = datetime.now(timezone.utc) + timedelta(days=7)
@@ -152,6 +163,7 @@ async def test_register_duplicate_email_raises_conflict():
 
 
 # ─── login ────────────────────────────────────────────────────────────────────
+
 
 async def test_login_returns_tokens():
     service_temp = make_auth_service()
@@ -203,6 +215,7 @@ async def test_login_unknown_email_raises():
 
 # ─── refresh ──────────────────────────────────────────────────────────────────
 
+
 async def test_refresh_returns_new_access_token():
     service = make_auth_service()
     user = User(id=3, name="Carol", email="carol@test.com", hashed_password="x")
@@ -236,7 +249,9 @@ async def test_refresh_with_revoked_token_raises():
 
     rt_repo = AsyncMock()
     revoked_record = RefreshToken(
-        id=1, user_id=3, token_jti=jti,
+        id=1,
+        user_id=3,
+        token_jti=jti,
         expires_at=datetime.now(timezone.utc) + timedelta(days=7),
         revoked_at=datetime.now(timezone.utc),
     )
@@ -259,6 +274,7 @@ async def test_refresh_with_access_token_raises():
 
 
 # ─── logout ───────────────────────────────────────────────────────────────────
+
 
 async def test_logout_revokes_all_tokens():
     rt_repo = AsyncMock()

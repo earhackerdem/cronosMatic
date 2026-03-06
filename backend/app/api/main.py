@@ -11,4 +11,3 @@ api_router.include_router(categories.router)
 api_router.include_router(auth_router)
 api_router.include_router(users_router)
 api_router.include_router(auth_status_router)
-
