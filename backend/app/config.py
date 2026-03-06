@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 7
 
+    storage_base_url: str = Field(
+        default="",
+        description="Base URL for S3/storage assets. Set via BACKEND_STORAGE_BASE_URL.",
+    )
+
     database_url: str = Field(
         validation_alias="DATABASE_URL",
         description="PostgreSQL connection string. Set via DATABASE_URL env var.",
