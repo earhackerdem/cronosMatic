@@ -20,6 +20,7 @@ from app.main import app
 # Import all models so they register with Base.metadata
 from app.models import Item  # noqa: F401
 from app.models.category import CategoryModel  # noqa: F401
+from app.models.product import ProductModel  # noqa: F401
 from app.models.refresh_token import RefreshTokenModel  # noqa: F401
 from app.models.user import UserModel  # noqa: F401
 
@@ -48,7 +49,7 @@ async def db_session():
     async with engine.begin() as conn:
         await conn.execute(
             text(
-                "TRUNCATE TABLE categories, refresh_tokens, users RESTART IDENTITY CASCADE"
+                "TRUNCATE TABLE products, categories, refresh_tokens, users RESTART IDENTITY CASCADE"
             )
         )
 
@@ -88,7 +89,7 @@ async def client():
     async with engine.begin() as conn:
         await conn.execute(
             text(
-                "TRUNCATE TABLE categories, refresh_tokens, users RESTART IDENTITY CASCADE"
+                "TRUNCATE TABLE products, categories, refresh_tokens, users RESTART IDENTITY CASCADE"
             )
         )
 
