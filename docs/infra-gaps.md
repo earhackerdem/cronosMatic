@@ -14,12 +14,13 @@ Each should be resolved **during the ticket that introduces the dependency**.
   - Fixed to "React"; CORS origins include both Vite (5173) and legacy (4200) ports
 - Redis/Celery deferred to Tickets 04/08
 
-## Ticket 01 (Auth)
-- `Settings` class uses `env_prefix = "BACKEND_"`. JWT vars (`JWT_SECRET_KEY`, etc.) need either:
-  - `validation_alias` like `DATABASE_URL` already does, OR
-  - Rename to `BACKEND_JWT_SECRET_KEY` etc.
-- Add JWT/auth env vars to `.env.example`, `docker-compose.yml` backend service, and `Makefile` commands
-- Add `passlib[bcrypt]`, `python-jose[cryptography]` (or `PyJWT`) to `pyproject.toml`
+## Ticket 01 (Auth) ✅ RESOLVED
+- ~~`Settings` class uses `env_prefix = "BACKEND_"`. JWT vars need `BACKEND_JWT_*` naming~~
+  - Added `jwt_secret_key`, `jwt_access_token_expire_minutes`, `jwt_refresh_token_expire_days` to Settings
+- ~~Add JWT/auth env vars to `.env.example`, `docker-compose.yml` backend service, and `Makefile` commands~~
+  - Added to all files including Makefile test commands
+- ~~Add `passlib[bcrypt]`, `python-jose[cryptography]` to `pyproject.toml`~~
+  - Added via `uv add`; also added `email-validator` for Pydantic EmailStr
 
 ## Ticket 03 (Products + Images)
 - Add `boto3` to `pyproject.toml`
