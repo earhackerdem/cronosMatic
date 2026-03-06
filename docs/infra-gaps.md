@@ -31,10 +31,10 @@ Each should be resolved **during the ticket that introduces the dependency**.
 - ~~Add `AWS_*` env vars to `.env.example` and `docker-compose.yml`~~ — already resolved in ticket 02
 - Added `python-multipart` via `uv add python-multipart` (required for UploadFile/form data in FastAPI)
 
-## Ticket 04 (Cart)
-- Add `redis` service to `docker-compose.yml`
-- Add `REDIS_URL` to `.env.example` and compose backend env
-- Add `redis` Python package to `pyproject.toml` (if needed for direct access beyond Celery)
+## Ticket 04 (Cart) ✅ RESOLVED
+- ~~Add `redis` service to `docker-compose.yml`~~ — added with healthcheck, volume, and network
+- ~~Add `REDIS_URL` to `.env.example` and compose backend env~~ — added to both + `config.py`
+- ~~Add `redis` Python package to `pyproject.toml`~~ — added via `uv add redis`
 
 ## Ticket 06 (Orders)
 - Add `DEFAULT_SHIPPING_COST` to `.env.example` and compose
