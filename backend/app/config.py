@@ -12,7 +12,6 @@ class Settings(BaseSettings):
         description="PostgreSQL connection string. Set via DATABASE_URL env var.",
     )
 
-
     model_config = {"env_prefix": "BACKEND_"}
 
     @computed_field  # type: ignore[prop-decorator]
