@@ -22,6 +22,19 @@ class Settings(BaseSettings):
         description="Base URL for S3/storage assets. Set via BACKEND_STORAGE_BASE_URL.",
     )
 
+    aws_access_key_id: str = Field(
+        default="", validation_alias="AWS_ACCESS_KEY_ID"
+    )
+    aws_secret_access_key: str = Field(
+        default="", validation_alias="AWS_SECRET_ACCESS_KEY"
+    )
+    aws_region: str = Field(
+        default="us-east-1", validation_alias="AWS_REGION"
+    )
+    aws_s3_bucket: str = Field(
+        default="", validation_alias="AWS_S3_BUCKET"
+    )
+
     database_url: str = Field(
         validation_alias="DATABASE_URL",
         description="PostgreSQL connection string. Set via DATABASE_URL env var.",
