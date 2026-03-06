@@ -1,47 +1,89 @@
-# CronosMatic — Project Rules
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-- E-commerce backend for watches (CronosMatic)
-- FastAPI + SQLAlchemy 2.0 async + PostgreSQL + Celery/Redis
-- Python 3.12+, Pydantic v2, Alembic migrations
-- Backend lives in `backend/`, uses `uv` for dependency management
-- Migrations dir is `backend/migrations/` (NOT `alembic/`)
 
-## Key Files
-- `backend/pyproject.toml` — dependencies and config
-- `backend/app/config.py` — Settings with `env_prefix = "BACKEND_"` (note: `DATABASE_URL` uses `validation_alias` to bypass prefix)
-- `docker-compose.yml` — db, pgadmin, backend, frontend (missing Redis, Celery — added per ticket)
-- `.env.example` / `.env` — env vars (expanded per ticket as needed)
-- `Makefile` — dev commands (up, down, migrate, test)
-- `docs/tickets/00-09` — implementation tickets
-- `docs/infra-gaps.md` — per-ticket infrastructure gaps to resolve during implementation
+E-commerce backend for watches (CronosMatic). FastAPI + SQLAlchemy 2.0 async + PostgreSQL + Celery/Redis. Python 3.12+, Pydantic v2, Alembic migrations. Frontend is React 19 + TypeScript + Vite.
 
-## Infra Notes
-- `Settings` uses `env_prefix="BACKEND_"` — new env vars need `validation_alias` if they don't follow this prefix
-- Dockerfile copies `migrations/` not `alembic/`
-- Frontend port 4200, framework TBD (Angular or React — needs clarification)
-- CORS currently uses `allow_headers=["*"]`, `allow_credentials=True`
+## Common Commands
+
+```bash
+# Docker
+make up              # Start all services
+make down            # Stop all services
+make build           # Rebuild images
+make clean           # Stop services and remove volumes
+
+# Database
+make db-migrate                    # Run Alembic migrations
+make db-revision MSG="description" # Create new migration
+
+# Backend tests (requires running DB)
+make test-back                     # Run all backend tests
+cd backend && DATABASE_URL="..." BACKEND_SECRET_KEY="..." uv run pytest tests/test_health.py        # Single test file
+cd backend && DATABASE_URL="..." BACKEND_SECRET_KEY="..." uv run pytest tests/test_health.py -k test_name  # Single test
+
+# Frontend tests
+make test-front      # Run frontend tests (vitest)
+
+# Linting
+cd backend && uv run ruff check .    # Backend lint
+cd backend && uv run ruff format .   # Backend format
+cd frontend && npm run lint          # Frontend lint
+```
+
+## Architecture
+
+### Backend (`backend/app/`)
+
+Uses a **layered domain architecture** with clear separation:
+
+1. **Domain layer** (`domain/<entity>/`) — Pure Python dataclasses as entities + repository interfaces (Python `Protocol`). No framework dependencies.
+2. **Repository layer** (`repositories/`) — Concrete SQLAlchemy implementations of domain repository interfaces. Handles mapping between domain entities and SQLAlchemy models (`_to_domain` / `_to_model`).
+3. **Service layer** (`services/`) — Business logic. Depends on repository interfaces, not implementations. Raises domain-specific exceptions (e.g., `CategoryConflictError`).
+4. **API layer** (`api/routers/`) — FastAPI route handlers. Uses `Depends()` to wire services with concrete repositories. Catches service exceptions and maps to HTTP errors.
+5. **Models** (`models/`) — SQLAlchemy ORM models (DB schema).
+6. **Schemas** (`schemas/`) — Pydantic v2 request/response schemas.
+
+**Dependency flow:** Router → Service → Repository Interface ← Concrete Repository → SQLAlchemy Model
+
+**DI wiring pattern** (in each router file):
+```python
+async def get_category_service(session=Depends(get_db_session)) -> CategoryService:
+    repository = CategoryRepository(session)
+    return CategoryService(repository)
+```
+
+### Key Infrastructure
+
+- `app/config.py` — `Settings` with `env_prefix="BACKEND_"`. For env vars without this prefix (e.g., `DATABASE_URL`), use `validation_alias`.
+- `app/db/engine.py` — Async engine + session factory + `get_db_session` dependency.
+- `app/main.py` — FastAPI app, CORS middleware, lifespan (engine dispose).
+- `app/api/main.py` — Central router aggregation.
+- Migrations dir: `backend/migrations/` (NOT `alembic/`).
+- Package manager: `uv` (not pip). Use `uv add <package>` to add dependencies.
+- Tests use `pytest-asyncio` with `asyncio_mode = "auto"` and `httpx.AsyncClient` with `ASGITransport`.
 
 ## Ticket Implementation Rule
 
-When implementing a ticket, **always check `docs/infra-gaps.md`** for infrastructure gaps that must be resolved as part of that ticket. Each ticket session must:
+When implementing a ticket, **always check `docs/infra-gaps.md`** for infrastructure gaps. Each ticket session must:
 
 1. **Read the ticket** from `docs/tickets/XX-name.md`
 2. **Check infra gaps** for that ticket number in `docs/infra-gaps.md`
-3. **Resolve infra gaps first**: add missing env vars to `.env.example`, `.env`, `docker-compose.yml`; add missing Python deps to `pyproject.toml`; add/update Docker services if needed
+3. **Resolve infra gaps first**: add missing env vars to `.env.example`, `.env`, `docker-compose.yml`; add missing Python deps to `pyproject.toml`; add/update Docker services
 4. **Implement the ticket** following the spec
-5. **Update `Makefile`** if new commands are needed (e.g., celery worker)
+5. **Update `Makefile`** if new commands are needed
 6. **Run tests** before considering the ticket done
 7. **Mark resolved infra gaps** as done in `docs/infra-gaps.md`
 
 ## Code Conventions
 
-- **Settings**: `backend/app/config.py` uses `env_prefix = "BACKEND_"`. For env vars that don't follow this prefix (e.g., `DATABASE_URL`, `REDIS_URL`), use `validation_alias` on the field.
-- **Migrations**: directory is `backend/migrations/`, NOT `alembic/`.
-- **Package manager**: `uv` (not pip). Use `uv add <package>` to add dependencies.
 - **Async everything**: SQLAlchemy 2.0 async with `AsyncSession`. Never use sync session in FastAPI handlers.
 - **HTTP status codes**: 401 auth failures, 404 not-found/ownership, 422 only for Pydantic validation errors.
 - **`HTTPException.detail`**: always a string, never a dict.
 - **Query params**: always snake_case.
 - **`updated_at`**: use SQLAlchemy `onupdate=func.now()`, not DB triggers.
 - **DELETE responses**: 204 No Content (except cart endpoints which return the updated cart).
+- **i18n fields**: Stored as `dict[str, str]` JSON (e.g., `{"en": "Pocket", "es": "Bolsillo"}`).
+- **Soft deletes**: Use `deleted_at` timestamp, filter with `.where(Model.deleted_at.is_(None))`.
