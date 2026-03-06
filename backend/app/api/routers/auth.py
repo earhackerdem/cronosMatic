@@ -18,7 +18,12 @@ from app.schemas.user import (
     TokenResponse,
     UserResponse,
 )
-from app.services.auth import AuthService, InvalidCredentialsError, InvalidTokenError, UserConflictError
+from app.services.auth import (
+    AuthService,
+    InvalidCredentialsError,
+    InvalidTokenError,
+    UserConflictError,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -96,11 +101,13 @@ async def logout(
 auth_status_router = APIRouter(tags=["auth"])
 
 
-@auth_status_router.get("/auth-status", status_code=200, response_model=AuthStatusResponse)
+@auth_status_router.get(
+    "/auth-status", status_code=200, response_model=AuthStatusResponse
+)
 async def auth_status(current_user: User = Depends(get_current_user)):
     return AuthStatusResponse(
-        status="authenticated",
-        message="User is authenticated.",
+        status="ok",
+        message="Authentication is working",
         user=UserResponse.model_validate(current_user),
         timestamp=datetime.now(timezone.utc),
     )
