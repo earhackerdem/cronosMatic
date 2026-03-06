@@ -25,7 +25,7 @@ Table: users
 | password           | String(255)  | NOT NULL (hashed with bcrypt)  |
 | is_admin           | Boolean      | NOT NULL, DEFAULT false        |
 | created_at         | DateTime     | NOT NULL, DEFAULT now()        |
-| updated_at         | DateTime     | NOT NULL, DEFAULT now(), ON UPDATE now() |
+| updated_at         | DateTime     | NOT NULL, DEFAULT now(), onupdate=now() (SQLAlchemy `onupdate`) |
 ```
 
 ---
@@ -95,7 +95,7 @@ Table: users
 ```
 
 **Errors:**
-- 422: incorrect credentials. Return error on the `email` field with message: `"The provided credentials are incorrect."`
+- 401: incorrect credentials. Return `{ "detail": "The provided credentials are incorrect." }`
 
 ---
 
@@ -184,6 +184,35 @@ Table: users
 
 ---
 
+## Refresh Token Storage
+
+Refresh tokens must be stored server-side to support invalidation (logout). Use one of the following approaches:
+
+**Option A — `refresh_tokens` table (recommended):**
+```
+Table: refresh_tokens
+
+| Field      | Type        | Constraints                    |
+|------------|-------------|-------------------------------|
+| id         | Integer     | PK, autoincrement              |
+| user_id    | Integer     | FK → users.id, NOT NULL        |
+| token_jti  | String(255) | NOT NULL, UNIQUE (JWT ID)      |
+| expires_at | DateTime    | NOT NULL                       |
+| revoked_at | DateTime    | NULLABLE                       |
+| created_at | DateTime    | NOT NULL, DEFAULT now()        |
+```
+
+- When issuing a refresh token, include a `jti` (JWT ID) claim and store a record in this table.
+- On `POST /auth/refresh`, verify the `jti` exists and is not revoked.
+- On `POST /auth/logout`, set `revoked_at = now()` for the user's active refresh tokens.
+- Periodically clean up expired rows.
+
+**Option B — Redis blacklist:**
+- On logout, store the refresh token's `jti` in Redis with a TTL matching the token's remaining lifetime.
+- On refresh, check Redis for the `jti` before issuing a new access token.
+
+---
+
 ## Dependency: get_current_user
 
 Create a reusable FastAPI Dependency:
@@ -199,7 +228,7 @@ Same as `get_current_user` but returns `None` if no token is present (instead of
 
 ## Dependency: require_admin
 
-Uses `get_current_user`, verifies that `user.is_admin == True`. If not, returns 403 with `{ "message": "Forbidden. User is not an administrator." }`.
+Uses `get_current_user`, verifies that `user.is_admin == True`. If not, returns 403 with `{ "detail": "Forbidden. User is not an administrator." }`.
 
 ---
 
@@ -208,7 +237,7 @@ Uses `get_current_user`, verifies that `user.is_admin == True`. If not, returns 
 - [ ] Registration creates a user with a hashed password in the DB
 - [ ] Registration returns access + refresh token
 - [ ] Login with correct credentials returns tokens
-- [ ] Login with incorrect credentials returns 422
+- [ ] Login with incorrect credentials returns 401
 - [ ] Registration with a duplicate email returns 422
 - [ ] `GET /users/me` with a valid token returns user data
 - [ ] `GET /users/me` without a token returns 401

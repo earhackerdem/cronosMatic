@@ -47,7 +47,7 @@ async def require_admin(current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
         raise HTTPException(
             status_code=403,
-            detail={"message": "Forbidden. User is not an administrator."}
+            detail="Forbidden. User is not an administrator.",
         )
     return current_user
 ```

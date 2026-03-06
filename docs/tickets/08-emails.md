@@ -131,20 +131,22 @@ def send_order_confirmation_email(self, order_id: int):
 
 ```python
 # In OrderService.update_payment_status():
-def update_payment_status(self, order, payment_status, payment_id, payment_gateway):
+async def update_payment_status(
+    self, db: AsyncSession, order, payment_status, payment_id, payment_gateway
+):
     order.payment_status = payment_status
     order.payment_id = payment_id
     order.payment_gateway = payment_gateway
-    
+
     if payment_status == PaymentStatus.PAID and order.status == OrderStatus.PENDING_PAYMENT:
         order.status = OrderStatus.PROCESSING
-    
-    db.commit()
-    
-    # Enqueue email if paid
+
+    await db.commit()
+
+    # Enqueue email if paid (Celery task — sync call, non-blocking)
     if payment_status == PaymentStatus.PAID:
         send_order_confirmation_email.delay(order.id)
-    
+
     return order
 ```
 

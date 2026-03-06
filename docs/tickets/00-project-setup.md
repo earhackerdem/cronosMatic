@@ -88,10 +88,10 @@ app/
     ├── security.py            # JWT encode/decode, password hash/verify
     ├── pagination.py          # Pagination helper
     └── s3.py                  # S3 upload helper
-alembic/                       # Alembic migrations
+alembic.ini                        # Alembic config (project root)
+alembic/                           # Alembic migrations
 ├── versions/
-├── env.py
-└── alembic.ini
+└── env.py
 tests/
 ├── conftest.py                # Fixtures (db session, client, auth headers)
 ├── test_auth.py
@@ -132,6 +132,8 @@ PAYPAL_MODE=sandbox
 PAYPAL_CLIENT_ID=<client_id>
 PAYPAL_CLIENT_SECRET=<client_secret>
 PAYPAL_SIMULATE_PAYMENTS=true
+PAYMENT_CURRENCY=MXN
+PAYMENT_COUNTRY_CODE=MX
 
 # Email
 MAIL_FROM=noreply@cronosmatic.com
@@ -146,6 +148,20 @@ DEBUG=true
 CORS_ORIGINS=http://localhost:5173
 DEFAULT_SHIPPING_COST=100.00
 ```
+
+---
+
+## SQLAlchemy `updated_at` Pattern
+
+PostgreSQL does not support `ON UPDATE` natively. Use SQLAlchemy's `onupdate` parameter on all `updated_at` columns:
+
+```python
+from sqlalchemy import Column, DateTime, func
+
+updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+```
+
+This ensures `updated_at` is set automatically on every update without needing DB triggers.
 
 ---
 

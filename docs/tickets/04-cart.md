@@ -28,7 +28,7 @@ Table: carts
 | total_amount | Decimal(10,2)| NOT NULL, DEFAULT 0.00         |
 | expires_at   | DateTime     | NULLABLE                       |
 | created_at   | DateTime     | NOT NULL, DEFAULT now()        |
-| updated_at   | DateTime     | NOT NULL, DEFAULT now()        |
+| updated_at   | DateTime     | NOT NULL, DEFAULT now(), onupdate=now() (SQLAlchemy `onupdate`) |
 ```
 
 **Note:** `total_items` and `total_amount` are stored in the DB but are dynamically recalculated in the API response from the items. The stored value is updated for consistency.

@@ -34,7 +34,7 @@ Table: addresses
 | phone          | String(20)   | NULLABLE                       |
 | is_default     | Boolean      | NOT NULL, DEFAULT false        |
 | created_at     | DateTime     | NOT NULL, DEFAULT now()        |
-| updated_at     | DateTime     | NOT NULL, DEFAULT now()        |
+| updated_at     | DateTime     | NOT NULL, DEFAULT now(), onupdate=now() (SQLAlchemy `onupdate`) |
 ```
 
 **Note:** `user_id` is NULLABLE because guest orders create temporary addresses with `user_id = null` (see Ticket 06).
@@ -132,31 +132,26 @@ Implement in the Python service layer (NOT as a DB trigger):
 
 ### GET /api/v1/user/addresses/{id}
 
-**Auth:** Bearer token  
-**Rules:** If the address does not belong to the user → 403.  
+**Auth:** Bearer token
+**Rules:** If the address does not exist or does not belong to the user → 404.
 **Response 200:** The Address object.
 
 ---
 
 ### PUT /api/v1/user/addresses/{id}
 
-**Auth:** Bearer token  
-**Request body:** Same fields as POST, all optional (partial update).  
-**Rules:** If the address does not belong to the user → 403.  
+**Auth:** Bearer token
+**Request body:** Same fields as POST, all optional (partial update).
+**Rules:** If the address does not exist or does not belong to the user → 404.
 **Response 200:** The updated Address object.
 
 ---
 
 ### DELETE /api/v1/user/addresses/{id}
 
-**Auth:** Bearer token  
-**Rules:** If the address does not belong to the user → 403.  
-**Response 200:**
-```json
-{
-  "message": "Address deleted successfully."
-}
-```
+**Auth:** Bearer token
+**Rules:** If the address does not exist or does not belong to the user → 404.
+**Response:** 204 No Content
 
 ---
 
@@ -164,7 +159,7 @@ Implement in the Python service layer (NOT as a DB trigger):
 
 **Auth:** Bearer token  
 **Rules:**
-- If the address does not belong to the user → 403.
+- If the address does not exist or does not belong to the user → 404.
 - Sets `is_default = True` on this address.
 - Deactivates `is_default` on other addresses of the same type for the user.
 
@@ -182,11 +177,11 @@ Implement in the Python service layer (NOT as a DB trigger):
 - [ ] Required fields are validated (422 if missing)
 - [ ] Type must be `shipping` or `billing` (422 if invalid)
 - [ ] `full_name` and `full_address` are computed correctly in response
-- [ ] Cannot view another user's address (403)
-- [ ] Cannot update another user's address (403)
-- [ ] Cannot delete another user's address (403)
+- [ ] Cannot view another user's address (404 — prevents information leakage)
+- [ ] Cannot update another user's address (404)
+- [ ] Cannot delete another user's address (404)
 - [ ] Creating an address as default deactivates other defaults of the same type
 - [ ] Updating an address to default deactivates other defaults of the same type
 - [ ] Set-default deactivates the previous default of the same type
 - [ ] Defaults of different types coexist without conflict
-- [ ] Cannot set-default on another user's address (403)
+- [ ] Cannot set-default on another user's address (404)

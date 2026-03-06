@@ -31,6 +31,8 @@ class PayPalPaymentService:
 | `PAYPAL_CLIENT_ID` | PayPal Client ID |
 | `PAYPAL_CLIENT_SECRET` | PayPal Client Secret |
 | `PAYPAL_SIMULATE_PAYMENTS` | `true` for simulation in dev/staging |
+| `PAYMENT_CURRENCY` | Currency code (default: `MXN`) |
+| `PAYMENT_COUNTRY_CODE` | Country code (default: `MX`) |
 
 **Base URLs:**
 - Sandbox: `https://api.sandbox.paypal.com`
@@ -53,17 +55,17 @@ class PayPalPaymentService:
   "purchase_units": [{
     "reference_id": "<order_number>",
     "amount": {
-      "currency_code": "MXN",
+      "currency_code": "<PAYMENT_CURRENCY>",
       "value": "<total_amount>",
       "breakdown": {
-        "item_total": { "currency_code": "MXN", "value": "<subtotal>" },
-        "shipping": { "currency_code": "MXN", "value": "<shipping_cost>" }
+        "item_total": { "currency_code": "<PAYMENT_CURRENCY>", "value": "<subtotal>" },
+        "shipping": { "currency_code": "<PAYMENT_CURRENCY>", "value": "<shipping_cost>" }
       }
     },
     "items": [
       {
         "name": "<product_name>",
-        "unit_amount": { "currency_code": "MXN", "value": "<price_per_unit>" },
+        "unit_amount": { "currency_code": "<PAYMENT_CURRENCY>", "value": "<price_per_unit>" },
         "quantity": "<quantity>"
       }
     ],
@@ -75,7 +77,7 @@ class PayPalPaymentService:
         "admin_area_2": "<city>",
         "admin_area_1": "<state>",
         "postal_code": "...",
-        "country_code": "MX"
+        "country_code": "<PAYMENT_COUNTRY_CODE>"
       }
     }
   }],
@@ -229,7 +231,7 @@ class PayPalPaymentService:
 
 ### GET /api/v1/payments/paypal/verify-config
 
-**Auth:** Bearer token OR `X-Session-ID`  
+**Auth:** Bearer token + `require_admin` (admin only — exposes infrastructure details)
 **Response 200:**
 ```json
 {
@@ -274,4 +276,5 @@ class PayPalPaymentService:
 - [ ] Verify-config reports PayPal configuration status
 - [ ] PayPal API errors are handled gracefully with descriptive messages
 - [ ] Access token is obtained correctly via Basic Auth
-- [ ] Currency hardcoded as `MXN`, country_code as `MX`
+- [ ] Currency and country_code are configurable via `PAYMENT_CURRENCY` and `PAYMENT_COUNTRY_CODE` env vars (default: `MXN`, `MX`)
+- [ ] `verify-config` endpoint requires admin authentication

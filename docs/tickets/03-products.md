@@ -32,7 +32,7 @@ Table: products
 | image_path     | String(500)   | NULLABLE                       |
 | is_active      | Boolean       | NOT NULL, DEFAULT true         |
 | created_at     | DateTime      | NOT NULL, DEFAULT now()        |
-| updated_at     | DateTime      | NOT NULL, DEFAULT now()        |
+| updated_at     | DateTime      | NOT NULL, DEFAULT now(), onupdate=now() (SQLAlchemy `onupdate`) |
 ```
 
 **Relations:**
@@ -63,8 +63,8 @@ In the **response schema** (Pydantic), include `image_url`:
 |-------|------|---------|-------------|
 | category | string | - | Filter by active category slug |
 | search | string | - | Search in name, description, SKU |
-| sortBy | string | created_at | Options: `name`, `price`, `created_at` |
-| sortDirection | string | desc | Options: `asc`, `desc` |
+| sort_by | string | created_at | Options: `name`, `price`, `created_at` |
+| sort_direction | string | desc | Options: `asc`, `desc` |
 | page | int | 1 | Current page |
 | size | int | 12 | Items per page |
 
@@ -104,7 +104,7 @@ In the **response schema** (Pydantic), include `image_url`:
 
 **Rules:**
 - Only returns products with `is_active = true`.
-- If the `category` param is a slug of an INACTIVE category → return 422 with an error on the `category` field.
+- If the `category` param is a slug of an INACTIVE category → return 404 with `{ "detail": "Category not found." }`.
 - Search via `search` applies `ILIKE` on `name`, `description`, and `sku`.
 - Include a nested `category` object (id, name, slug) in each product.
 
@@ -136,7 +136,7 @@ In the **response schema** (Pydantic), include `image_url`:
 
 **Rules:**
 - Look up by `slug`, not by ID.
-- If the product is NOT active → return 422 with an error on the `slug` field.
+- If the product is NOT active → return 404 with `{ "detail": "Product not found." }`.
 
 ---
 
@@ -159,6 +159,7 @@ In the **response schema** (Pydantic), include `image_url`:
 {
   "category_id": "integer (required)",
   "name": "string (required)",
+  "slug": "string (optional, auto-generated from name if not provided, unique)",
   "sku": "string (required, unique)",
   "description": "string (optional)",
   "price": "decimal (required, > 0)",
@@ -232,10 +233,10 @@ In the **response schema** (Pydantic), include `image_url`:
 
 - [ ] `GET /products` only returns active products
 - [ ] `GET /products` supports filtering by category (slug), search, and sorting
-- [ ] Filtering by an inactive category returns 422
+- [ ] Filtering by an inactive category returns 404
 - [ ] Search works on name, description, and SKU
 - [ ] Sorting works by name, price, created_at (asc/desc)
-- [ ] `GET /products/{slug}` for an inactive product returns 422
+- [ ] `GET /products/{slug}` for an inactive product returns 404
 - [ ] `image_url` is `null` when `image_path` is null
 - [ ] `image_url` returns the full URL when `image_path` exists
 - [ ] Admin can perform full CRUD on products

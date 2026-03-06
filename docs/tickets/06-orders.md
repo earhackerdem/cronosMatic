@@ -37,7 +37,7 @@ Table: orders
 | shipping_method_name| String(100)   | NULLABLE                       |
 | notes               | Text          | NULLABLE                       |
 | created_at          | DateTime      | NOT NULL, DEFAULT now()        |
-| updated_at          | DateTime      | NOT NULL, DEFAULT now()        |
+| updated_at          | DateTime      | NOT NULL, DEFAULT now(), onupdate=now() (SQLAlchemy `onupdate`) |
 ```
 
 ### OrderItem
@@ -195,7 +195,7 @@ Table: order_items
 
 **Errors:**
 - 422: empty cart, insufficient stock, invalid payment_method, guest_email required for guests
-- 403 or 422: `shipping_address_id` not found or does not belong to the user (handled sequentially in the endpoint logic).
+- 404: `shipping_address_id` not found or does not belong to the user.
 
 ---
 
@@ -234,7 +234,7 @@ Required methods:
 - `get_order_by_number(order_number, user_id)` → Order or None
 - `generate_order_number()` → string (format CM-YYYY-XXXXXXXX, unique)
 
-**canBeCancelled rule:** Only orders in `pending_payment` or `processing` can be cancelled. `shipped`, `delivered`, `cancelled` → cannot be cancelled.
+**`can_be_cancelled` rule:** Only orders in `pending_payment` or `processing` can be cancelled. `shipped`, `delivered`, `cancelled` → cannot be cancelled.
 
 ---
 

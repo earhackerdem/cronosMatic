@@ -26,7 +26,7 @@ Table: categories
 | image_path  | String(500)  | NULLABLE                       |
 | is_active   | Boolean      | NOT NULL, DEFAULT true         |
 | created_at  | DateTime     | NOT NULL, DEFAULT now()        |
-| updated_at  | DateTime     | NOT NULL, DEFAULT now()        |
+| updated_at  | DateTime     | NOT NULL, DEFAULT now(), onupdate=now() (SQLAlchemy `onupdate`) |
 ```
 
 **Relations:**
@@ -106,7 +106,7 @@ In the **response schema** (Pydantic), include `image_url`:
 
 **Rules:**
 - Look up by `slug`, not by ID.
-- If the category is NOT active (`is_active = false`), return 422 with a validation error on the `slug` field.
+- If the category is NOT active (`is_active = false`), return 404 with `{ "detail": "Category not found." }`.
 - Includes the ACTIVE products of the category, paginated (default `size = 10`).
 - Inactive products of the category are NOT included.
 
@@ -181,7 +181,7 @@ In the **response schema** (Pydantic), include `image_url`:
 
 - [ ] `GET /categories` only returns active categories
 - [ ] `GET /categories/{slug}` returns active category with paginated active products
-- [ ] `GET /categories/{slug}` for an inactive category returns 422
+- [ ] `GET /categories/{slug}` for an inactive category returns 404
 - [ ] Inactive products do NOT appear in the category's product list
 - [ ] Category products are paginated (default 10/page)
 - [ ] Admin can list ALL categories (including inactive ones)
