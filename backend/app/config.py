@@ -11,6 +11,12 @@ class Settings(BaseSettings):
         "http://localhost:5173,http://localhost:4200"  # 5173=Vite, 4200=legacy fallback
     )
 
+    jwt_secret_key: str = Field(
+        description="Secret key for JWT signing. Set via BACKEND_JWT_SECRET_KEY."
+    )
+    jwt_access_token_expire_minutes: int = 30
+    jwt_refresh_token_expire_days: int = 7
+
     database_url: str = Field(
         validation_alias="DATABASE_URL",
         description="PostgreSQL connection string. Set via DATABASE_URL env var.",
