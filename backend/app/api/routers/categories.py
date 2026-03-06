@@ -58,7 +58,9 @@ async def list_categories(
 async def get_category_by_slug(
     slug: str,
     service: Annotated[CategoryService, Depends(get_category_service)],
-    product_service: Annotated[ProductService, Depends(get_product_service_for_categories)],
+    product_service: Annotated[
+        ProductService, Depends(get_product_service_for_categories)
+    ],
     page: int = 1,
     size: int = 10,
 ):

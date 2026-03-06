@@ -41,8 +41,8 @@ async def list_products(
     service: Annotated[ProductService, Depends(get_product_service)],
     category: str | None = None,
     search: str | None = None,
-    sort_by: str = "name",
-    sort_direction: str = "asc",
+    sort_by: str = "created_at",
+    sort_direction: str = "desc",
     page: int = 1,
     size: int = 12,
 ):

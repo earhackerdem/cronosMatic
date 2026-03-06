@@ -54,10 +54,22 @@ async def test_list_active_no_category_filter():
     cat_repo = AsyncMock()
     service = _make_service(repo, cat_repo)
 
-    items, total = await service.list_active(page=1, size=10, category_slug=None, search=None, sort_by="name", sort_direction="asc")
+    items, total = await service.list_active(
+        page=1,
+        size=10,
+        category_slug=None,
+        search=None,
+        sort_by="name",
+        sort_direction="asc",
+    )
     assert total == 1
     repo.list_active.assert_awaited_once_with(
-        offset=0, limit=10, category_id=None, search=None, sort_by="name", sort_direction="asc"
+        offset=0,
+        limit=10,
+        category_id=None,
+        search=None,
+        sort_by="name",
+        sort_direction="asc",
     )
 
 
@@ -69,11 +81,23 @@ async def test_list_active_with_category_slug_resolves_to_category_id():
     cat_repo.get_by_slug_active.return_value = cat
 
     service = _make_service(repo, cat_repo)
-    items, total = await service.list_active(page=1, size=10, category_slug="luxury", search=None, sort_by="name", sort_direction="asc")
+    items, total = await service.list_active(
+        page=1,
+        size=10,
+        category_slug="luxury",
+        search=None,
+        sort_by="name",
+        sort_direction="asc",
+    )
 
     cat_repo.get_by_slug_active.assert_awaited_once_with("luxury")
     repo.list_active.assert_awaited_once_with(
-        offset=0, limit=10, category_id=42, search=None, sort_by="name", sort_direction="asc"
+        offset=0,
+        limit=10,
+        category_id=42,
+        search=None,
+        sort_by="name",
+        sort_direction="asc",
     )
 
 
@@ -84,7 +108,14 @@ async def test_list_active_category_not_found_raises_error():
     service = _make_service(repo, cat_repo)
 
     with pytest.raises(ProductCategoryNotFoundError):
-        await service.list_active(page=1, size=10, category_slug="nonexistent", search=None, sort_by="name", sort_direction="asc")
+        await service.list_active(
+            page=1,
+            size=10,
+            category_slug="nonexistent",
+            search=None,
+            sort_by="name",
+            sort_direction="asc",
+        )
 
 
 # ─── list_all_admin ───────────────────────────────────────────────────────────
@@ -92,7 +123,10 @@ async def test_list_active_category_not_found_raises_error():
 
 async def test_list_all_admin():
     repo = AsyncMock()
-    repo.list_all.return_value = ([_make_product(), _make_product(id=2, is_active=False)], 2)
+    repo.list_all.return_value = (
+        [_make_product(), _make_product(id=2, is_active=False)],
+        2,
+    )
     service = _make_service(repo)
 
     items, total = await service.list_all_admin(page=1, size=15)
@@ -158,12 +192,14 @@ async def test_create_product_success():
     cat_repo.get_by_id.return_value = cat
     service = _make_service(repo, cat_repo)
 
-    result = await service.create_product({
-        "category_id": 1,
-        "name": "Rolex Explorer",
-        "sku": "SKU-001",
-        "price": Decimal("1999.99"),
-    })
+    result = await service.create_product(
+        {
+            "category_id": 1,
+            "name": "Rolex Explorer",
+            "sku": "SKU-001",
+            "price": Decimal("1999.99"),
+        }
+    )
     assert result == product
     repo.create.assert_awaited_once()
 
@@ -178,13 +214,15 @@ async def test_create_product_auto_generates_slug():
     cat_repo.get_by_id.return_value = cat
     service = _make_service(repo, cat_repo)
 
-    await service.create_product({
-        "category_id": 1,
-        "name": "Rolex Explorer",
-        "sku": "SKU-001",
-        "price": Decimal("1999.99"),
-        # no slug provided
-    })
+    await service.create_product(
+        {
+            "category_id": 1,
+            "name": "Rolex Explorer",
+            "sku": "SKU-001",
+            "price": Decimal("1999.99"),
+            # no slug provided
+        }
+    )
 
     # The entity passed to repo.create should have a slug derived from name
     created_entity = repo.create.call_args[0][0]
@@ -201,13 +239,15 @@ async def test_create_product_uses_provided_slug():
     cat_repo.get_by_id.return_value = cat
     service = _make_service(repo, cat_repo)
 
-    await service.create_product({
-        "category_id": 1,
-        "name": "Rolex Explorer",
-        "slug": "custom-slug",
-        "sku": "SKU-001",
-        "price": Decimal("1999.99"),
-    })
+    await service.create_product(
+        {
+            "category_id": 1,
+            "name": "Rolex Explorer",
+            "slug": "custom-slug",
+            "sku": "SKU-001",
+            "price": Decimal("1999.99"),
+        }
+    )
     created_entity = repo.create.call_args[0][0]
     assert created_entity.slug == "custom-slug"
 
@@ -219,12 +259,14 @@ async def test_create_product_category_not_found():
     service = _make_service(repo, cat_repo)
 
     with pytest.raises(ProductCategoryNotFoundError):
-        await service.create_product({
-            "category_id": 999,
-            "name": "Watch",
-            "sku": "SKU-X",
-            "price": Decimal("100.00"),
-        })
+        await service.create_product(
+            {
+                "category_id": 999,
+                "name": "Watch",
+                "sku": "SKU-X",
+                "price": Decimal("100.00"),
+            }
+        )
 
 
 async def test_create_product_slug_conflict():
@@ -236,13 +278,15 @@ async def test_create_product_slug_conflict():
     service = _make_service(repo, cat_repo)
 
     with pytest.raises(ProductConflictError):
-        await service.create_product({
-            "category_id": 1,
-            "name": "Rolex",
-            "slug": "rolex-explorer",
-            "sku": "NEW-SKU",
-            "price": Decimal("100.00"),
-        })
+        await service.create_product(
+            {
+                "category_id": 1,
+                "name": "Rolex",
+                "slug": "rolex-explorer",
+                "sku": "NEW-SKU",
+                "price": Decimal("100.00"),
+            }
+        )
 
 
 async def test_create_product_sku_conflict():
@@ -255,12 +299,14 @@ async def test_create_product_sku_conflict():
     service = _make_service(repo, cat_repo)
 
     with pytest.raises(ProductConflictError):
-        await service.create_product({
-            "category_id": 1,
-            "name": "New Watch",
-            "sku": "SKU-001",
-            "price": Decimal("100.00"),
-        })
+        await service.create_product(
+            {
+                "category_id": 1,
+                "name": "New Watch",
+                "sku": "SKU-001",
+                "price": Decimal("100.00"),
+            }
+        )
 
 
 # ─── update_product ───────────────────────────────────────────────────────────
@@ -293,7 +339,9 @@ async def test_update_product_slug_conflict():
     existing = _make_product(slug="original-slug")
     repo = AsyncMock()
     repo.get_by_id.return_value = existing
-    repo.get_by_slug.return_value = _make_product(id=99, slug="taken-slug")  # taken by another product
+    repo.get_by_slug.return_value = _make_product(
+        id=99, slug="taken-slug"
+    )  # taken by another product
     service = _make_service(repo)
 
     with pytest.raises(ProductConflictError):
@@ -304,7 +352,9 @@ async def test_update_product_sku_conflict():
     existing = _make_product(sku="OLD-SKU")
     repo = AsyncMock()
     repo.get_by_id.return_value = existing
-    repo.get_by_sku.return_value = _make_product(id=99, sku="TAKEN-SKU")  # taken by another product
+    repo.get_by_sku.return_value = _make_product(
+        id=99, sku="TAKEN-SKU"
+    )  # taken by another product
     service = _make_service(repo)
 
     with pytest.raises(ProductConflictError):

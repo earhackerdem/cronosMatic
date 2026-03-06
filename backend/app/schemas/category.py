@@ -58,7 +58,9 @@ class PaginatedCategoriesResponse(BaseModel):
 
 
 class CategoryDetailResponse(BaseModel):
-    from app.schemas.product import PaginatedProductsResponse as _PaginatedProductsResponse
+    from app.schemas.product import (
+        PaginatedProductsResponse as _PaginatedProductsResponse,
+    )
 
     category: CategoryResponse
     products: _PaginatedProductsResponse

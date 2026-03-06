@@ -168,12 +168,8 @@ class ProductRepository(ProductRepositoryInterface):
         models = result.scalars().all()
         return [self._to_domain(m) for m in models], total
 
-    async def list_all(
-        self, offset: int, limit: int
-    ) -> tuple[list[Product], int]:
-        count_result = await self.session.execute(
-            select(func.count(ProductModel.id))
-        )
+    async def list_all(self, offset: int, limit: int) -> tuple[list[Product], int]:
+        count_result = await self.session.execute(select(func.count(ProductModel.id)))
         total = count_result.scalar_one()
 
         result = await self.session.execute(

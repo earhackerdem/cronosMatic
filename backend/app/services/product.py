@@ -62,9 +62,7 @@ class ProductService:
             sort_direction=sort_direction,
         )
 
-    async def list_all_admin(
-        self, page: int, size: int
-    ) -> tuple[list[Product], int]:
+    async def list_all_admin(self, page: int, size: int) -> tuple[list[Product], int]:
         offset = (page - 1) * size
         return await self.repository.list_all(offset=offset, limit=size)
 
@@ -142,9 +140,17 @@ class ProductService:
 
         # Apply only the fields that were provided
         updatable_fields = (
-            "category_id", "name", "slug", "sku", "description",
-            "price", "stock_quantity", "brand", "movement_type",
-            "image_path", "is_active",
+            "category_id",
+            "name",
+            "slug",
+            "sku",
+            "description",
+            "price",
+            "stock_quantity",
+            "brand",
+            "movement_type",
+            "image_path",
+            "is_active",
         )
         for field_name in updatable_fields:
             if field_name in data:

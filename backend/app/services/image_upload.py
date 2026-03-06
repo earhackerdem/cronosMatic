@@ -23,7 +23,9 @@ class ImageUploadService:
     def __init__(self, settings: Settings):
         self.settings = settings
 
-    def _validate(self, content_type: str, content_length: int, file_content: bytes) -> None:
+    def _validate(
+        self, content_type: str, content_length: int, file_content: bytes
+    ) -> None:
         if content_type not in ALLOWED_MIME_TYPES:
             raise ImageUploadValidationError(
                 f"Invalid mime type '{content_type}'. Allowed types: {', '.join(sorted(ALLOWED_MIME_TYPES))}."

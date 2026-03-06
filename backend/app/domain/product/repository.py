@@ -36,9 +36,7 @@ class ProductRepositoryInterface(Protocol):
         """Returns active products with total count, supporting filters."""
         ...
 
-    async def list_all(
-        self, offset: int, limit: int
-    ) -> tuple[list[Product], int]:
+    async def list_all(self, offset: int, limit: int) -> tuple[list[Product], int]:
         """Returns all products (admin, no filter) with total count."""
         ...
 

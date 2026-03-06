@@ -147,8 +147,23 @@ async def test_list_products_default_size_is_12(prod_client):
 
 async def test_list_products_excludes_inactive(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="cat-for-active")
-    await _create_product(prod_client, admin_token, cat["id"], slug="active-prod", sku="ACT-1", is_active=True)
-    await _create_product(prod_client, admin_token, cat["id"], name="Inactive", slug="inactive-prod", sku="INACT-1", is_active=False)
+    await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        slug="active-prod",
+        sku="ACT-1",
+        is_active=True,
+    )
+    await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        name="Inactive",
+        slug="inactive-prod",
+        sku="INACT-1",
+        is_active=False,
+    )
 
     resp = await prod_client.get("/api/v1/products")
     data = resp.json()
@@ -159,8 +174,12 @@ async def test_list_products_excludes_inactive(prod_client, admin_token):
 async def test_list_products_filter_by_category_slug(prod_client, admin_token):
     cat1 = await _create_category(prod_client, admin_token, name="Cat A", slug="cat-a")
     cat2 = await _create_category(prod_client, admin_token, name="Cat B", slug="cat-b")
-    await _create_product(prod_client, admin_token, cat1["id"], slug="prod-a", sku="SKU-A")
-    await _create_product(prod_client, admin_token, cat2["id"], slug="prod-b", sku="SKU-B")
+    await _create_product(
+        prod_client, admin_token, cat1["id"], slug="prod-a", sku="SKU-A"
+    )
+    await _create_product(
+        prod_client, admin_token, cat2["id"], slug="prod-b", sku="SKU-B"
+    )
 
     resp = await prod_client.get("/api/v1/products?category=cat-a")
     data = resp.json()
@@ -175,8 +194,22 @@ async def test_list_products_404_for_invalid_category(prod_client):
 
 async def test_list_products_search_by_name(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="search-cat")
-    await _create_product(prod_client, admin_token, cat["id"], name="Rolex Submariner", slug="rolex-sub", sku="RS-001")
-    await _create_product(prod_client, admin_token, cat["id"], name="Omega Speedmaster", slug="omega-speed", sku="OS-001")
+    await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        name="Rolex Submariner",
+        slug="rolex-sub",
+        sku="RS-001",
+    )
+    await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        name="Omega Speedmaster",
+        slug="omega-speed",
+        sku="OS-001",
+    )
 
     resp = await prod_client.get("/api/v1/products?search=rolex")
     data = resp.json()
@@ -185,8 +218,12 @@ async def test_list_products_search_by_name(prod_client, admin_token):
 
 
 async def test_list_products_nested_category_in_response(prod_client, admin_token):
-    cat = await _create_category(prod_client, admin_token, name="Dive Watches", slug="dive-watches")
-    await _create_product(prod_client, admin_token, cat["id"], slug="dive-watch", sku="DW-001")
+    cat = await _create_category(
+        prod_client, admin_token, name="Dive Watches", slug="dive-watches"
+    )
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="dive-watch", sku="DW-001"
+    )
 
     resp = await prod_client.get("/api/v1/products")
     data = resp.json()
@@ -200,7 +237,9 @@ async def test_list_products_nested_category_in_response(prod_client, admin_toke
 async def test_list_products_custom_pagination(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="pg-cat")
     for i in range(7):
-        await _create_product(prod_client, admin_token, cat["id"], slug=f"pg-prod-{i}", sku=f"PG-{i}")
+        await _create_product(
+            prod_client, admin_token, cat["id"], slug=f"pg-prod-{i}", sku=f"PG-{i}"
+        )
 
     resp = await prod_client.get("/api/v1/products?page=2&size=5")
     data = resp.json()
@@ -212,8 +251,12 @@ async def test_list_products_custom_pagination(prod_client, admin_token):
 
 async def test_list_products_sort_by_price_desc(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="sort-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="cheap-w", sku="CH-1", price="100.00")
-    await _create_product(prod_client, admin_token, cat["id"], slug="exp-w", sku="EX-1", price="9999.00")
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="cheap-w", sku="CH-1", price="100.00"
+    )
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="exp-w", sku="EX-1", price="9999.00"
+    )
 
     resp = await prod_client.get("/api/v1/products?sort_by=price&sort_direction=desc")
     data = resp.json()
@@ -226,7 +269,9 @@ async def test_list_products_sort_by_price_desc(prod_client, admin_token):
 
 async def test_get_product_by_slug_returns_200(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="detail-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="detail-watch", sku="DT-001")
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="detail-watch", sku="DT-001"
+    )
 
     resp = await prod_client.get("/api/v1/products/detail-watch")
     assert resp.status_code == 200
@@ -238,7 +283,14 @@ async def test_get_product_by_slug_returns_200(prod_client, admin_token):
 
 async def test_get_product_by_slug_404_for_inactive(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="inactive-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="inactive-watch", sku="IW-001", is_active=False)
+    await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        slug="inactive-watch",
+        sku="IW-001",
+        is_active=False,
+    )
 
     resp = await prod_client.get("/api/v1/products/inactive-watch")
     assert resp.status_code == 404
@@ -251,7 +303,9 @@ async def test_get_product_by_slug_404_for_missing(prod_client):
 
 async def test_get_product_image_url_null_when_no_image_path(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="img-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="no-img-watch", sku="NI-001")
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="no-img-watch", sku="NI-001"
+    )
 
     resp = await prod_client.get("/api/v1/products/no-img-watch")
     assert resp.status_code == 200
@@ -261,9 +315,12 @@ async def test_get_product_image_url_null_when_no_image_path(prod_client, admin_
 async def test_get_product_image_url_passthrough_when_http(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="http-cat")
     await _create_product(
-        prod_client, admin_token, cat["id"],
-        slug="http-img-watch", sku="HI-001",
-        image_path="https://cdn.example.com/watch.jpg"
+        prod_client,
+        admin_token,
+        cat["id"],
+        slug="http-img-watch",
+        sku="HI-001",
+        image_path="https://cdn.example.com/watch.jpg",
     )
 
     resp = await prod_client.get("/api/v1/products/http-img-watch")
@@ -276,8 +333,17 @@ async def test_get_product_image_url_passthrough_when_http(prod_client, admin_to
 
 async def test_admin_list_products_returns_200(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="admin-list-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="a-prod-1", sku="AP-1", is_active=True)
-    await _create_product(prod_client, admin_token, cat["id"], slug="a-prod-2", sku="AP-2", is_active=False)
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="a-prod-1", sku="AP-1", is_active=True
+    )
+    await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        slug="a-prod-2",
+        sku="AP-2",
+        is_active=False,
+    )
 
     resp = await prod_client.get(
         "/api/v1/admin/products",
@@ -354,7 +420,9 @@ async def test_admin_create_product_auto_generates_slug(prod_client, admin_token
 
 async def test_admin_create_product_409_duplicate_slug(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="dup-slug-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="dup-watch", sku="DS-1")
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="dup-watch", sku="DS-1"
+    )
 
     resp = await prod_client.post(
         "/api/v1/admin/products",
@@ -384,7 +452,9 @@ async def test_admin_create_product_404_missing_category(prod_client, admin_toke
     assert resp.status_code == 404
 
 
-async def test_admin_create_product_422_missing_required_fields(prod_client, admin_token):
+async def test_admin_create_product_422_missing_required_fields(
+    prod_client, admin_token
+):
     resp = await prod_client.post(
         "/api/v1/admin/products",
         json={"name": "Watch"},  # missing category_id, sku, price
@@ -398,7 +468,9 @@ async def test_admin_create_product_422_missing_required_fields(prod_client, adm
 
 async def test_admin_get_product_by_id_returns_200(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="get-id-cat")
-    product = await _create_product(prod_client, admin_token, cat["id"], slug="get-id-watch", sku="GI-001")
+    product = await _create_product(
+        prod_client, admin_token, cat["id"], slug="get-id-watch", sku="GI-001"
+    )
 
     resp = await prod_client.get(
         f"/api/v1/admin/products/{product['id']}",
@@ -410,7 +482,14 @@ async def test_admin_get_product_by_id_returns_200(prod_client, admin_token):
 
 async def test_admin_get_product_by_id_includes_inactive(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="inactive-id-cat")
-    product = await _create_product(prod_client, admin_token, cat["id"], slug="inactive-id-watch", sku="II-001", is_active=False)
+    product = await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        slug="inactive-id-watch",
+        sku="II-001",
+        is_active=False,
+    )
 
     resp = await prod_client.get(
         f"/api/v1/admin/products/{product['id']}",
@@ -433,7 +512,14 @@ async def test_admin_get_product_by_id_404_not_found(prod_client, admin_token):
 
 async def test_admin_update_product_returns_200(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="update-cat")
-    product = await _create_product(prod_client, admin_token, cat["id"], name="Old Name", slug="old-name-watch", sku="UPD-001")
+    product = await _create_product(
+        prod_client,
+        admin_token,
+        cat["id"],
+        name="Old Name",
+        slug="old-name-watch",
+        sku="UPD-001",
+    )
 
     resp = await prod_client.put(
         f"/api/v1/admin/products/{product['id']}",
@@ -447,8 +533,12 @@ async def test_admin_update_product_returns_200(prod_client, admin_token):
 
 async def test_admin_update_product_409_slug_collision(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="collision-cat")
-    await _create_product(prod_client, admin_token, cat["id"], slug="slug-a-w", sku="SA-1")
-    prod_b = await _create_product(prod_client, admin_token, cat["id"], slug="slug-b-w", sku="SB-1")
+    await _create_product(
+        prod_client, admin_token, cat["id"], slug="slug-a-w", sku="SA-1"
+    )
+    prod_b = await _create_product(
+        prod_client, admin_token, cat["id"], slug="slug-b-w", sku="SB-1"
+    )
 
     resp = await prod_client.put(
         f"/api/v1/admin/products/{prod_b['id']}",
@@ -472,7 +562,9 @@ async def test_admin_update_product_404_not_found(prod_client, admin_token):
 
 async def test_admin_delete_product_returns_204(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="del-cat")
-    product = await _create_product(prod_client, admin_token, cat["id"], slug="to-delete-watch", sku="TD-001")
+    product = await _create_product(
+        prod_client, admin_token, cat["id"], slug="to-delete-watch", sku="TD-001"
+    )
 
     resp = await prod_client.delete(
         f"/api/v1/admin/products/{product['id']}",
@@ -491,7 +583,9 @@ async def test_admin_delete_product_404_not_found(prod_client, admin_token):
 
 async def test_admin_delete_product_hard_deletes(prod_client, admin_token):
     cat = await _create_category(prod_client, admin_token, slug="hard-del-cat")
-    product = await _create_product(prod_client, admin_token, cat["id"], slug="hard-del-watch", sku="HD-001")
+    product = await _create_product(
+        prod_client, admin_token, cat["id"], slug="hard-del-watch", sku="HD-001"
+    )
 
     # Delete
     await prod_client.delete(
