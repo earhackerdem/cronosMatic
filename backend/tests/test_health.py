@@ -1,9 +1,6 @@
 from unittest.mock import AsyncMock, patch
 
-import pytest
 
-
-@pytest.mark.asyncio
 async def test_health_returns_ok_with_db(client):
     mock_conn = AsyncMock()
     mock_conn.execute = AsyncMock()
@@ -21,7 +18,6 @@ async def test_health_returns_ok_with_db(client):
     assert data["database"] == "connected"
 
 
-@pytest.mark.asyncio
 async def test_health_returns_degraded_when_db_unavailable(client):
     with patch("app.api.routers.health.engine") as mock_engine:
         mock_engine.connect.side_effect = ConnectionRefusedError("DB down")
@@ -33,7 +29,6 @@ async def test_health_returns_degraded_when_db_unavailable(client):
     assert data["database"] == "unavailable"
 
 
-@pytest.mark.asyncio
 async def test_status_returns_ok(client):
     response = await client.get("/api/v1/status")
 
