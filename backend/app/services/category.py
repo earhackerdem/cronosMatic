@@ -25,7 +25,10 @@ class CategoryService:
         return await self.repository.get_by_slug(slug)
 
     async def create_category(
-        self, name_i18n: dict[str, str], slug: str, description_i18n: dict[str, str] | None = None
+        self,
+        name_i18n: dict[str, str],
+        slug: str,
+        description_i18n: dict[str, str] | None = None,
     ) -> Category:
         existing = await self.repository.get_by_slug(slug)
         if existing:
@@ -46,7 +49,9 @@ class CategoryService:
         if "slug" in data.model_fields_set and data.slug != category.slug:
             existing = await self.repository.get_by_slug(data.slug)
             if existing:
-                raise CategoryConflictError(f"Category with slug '{data.slug}' already exists")
+                raise CategoryConflictError(
+                    f"Category with slug '{data.slug}' already exists"
+                )
             category.slug = data.slug
 
         if "name" in data.model_fields_set:
@@ -59,7 +64,9 @@ class CategoryService:
         except ValueError:
             return None
         except IntegrityError:
-            raise CategoryConflictError(f"Category with slug '{category.slug}' already exists")
+            raise CategoryConflictError(
+                f"Category with slug '{category.slug}' already exists"
+            )
 
     async def replace_category(
         self,
@@ -75,7 +82,9 @@ class CategoryService:
         if slug != category.slug:
             existing = await self.repository.get_by_slug(slug)
             if existing:
-                raise CategoryConflictError(f"Category with slug '{slug}' already exists")
+                raise CategoryConflictError(
+                    f"Category with slug '{slug}' already exists"
+                )
 
         category.name = name_i18n
         category.slug = slug
