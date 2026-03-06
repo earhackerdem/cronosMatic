@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     debug: bool = False
     secret_key: str = Field(description="Secret key for signing. Set via BACKEND_SECRET_KEY.")
-    cors_origins: str = "http://localhost:4200"
+    cors_origins: str = "http://localhost:5173"
 
     database_url: str = Field(
         validation_alias="DATABASE_URL",
