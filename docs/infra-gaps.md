@@ -7,7 +7,7 @@ Each should be resolved **during the ticket that introduces the dependency**.
 - ~~Health endpoint is at `GET /health`, ticket says `GET /api/v1/status` — align during setup~~
   - Added `/api/v1` prefix to central router; added `GET /status` endpoint
 - ~~Ticket says `alembic/` directory but actual project uses `migrations/` — ticket must match reality~~
-  - Already resolved: project uses `migrations/`, ticket updated
+  - Resolved: renamed to `alembic/` (Python/Alembic convention)
 - ~~CORS: actual code uses `allow_headers=["*"]` and `allow_credentials=True`, ticket says restricted headers and `credentials: false` — decide during setup~~
   - CORS aligned: `credentials=False`, explicit methods and headers
 - ~~`.env.example` says "Angular", tickets say "React"~~
