@@ -88,3 +88,4 @@ When implementing a ticket, **always check `docs/infra-gaps.md`** for infrastruc
 - **DELETE responses**: 204 No Content (except cart endpoints which return the updated cart).
 - **i18n fields**: Stored as `dict[str, str]` JSON (e.g., `{"en": "Pocket", "es": "Bolsillo"}`).
 - **Soft deletes**: Use `deleted_at` timestamp, filter with `.where(Model.deleted_at.is_(None))`.
+- **Testing strategy**: Only write endpoint/integration tests (`httpx.AsyncClient` against real DB). No unit tests for domain entities, repositories, or services. The API tests cover all layers end-to-end.

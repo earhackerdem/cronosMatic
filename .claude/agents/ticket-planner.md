@@ -28,7 +28,7 @@ This project uses a layered domain architecture:
 - **Models** (`models/`) — SQLAlchemy ORM models
 - **Schemas** (`schemas/`) — Pydantic v2 request/response schemas
 
-Implementation order MUST follow: domain → model → repository → service → schema → router (with tests written FIRST at each layer per TDD).
+Implementation order MUST follow: domain → model → repository → service → schema → router. Tests are **endpoint integration tests only** — written after all layers are implemented, not per-layer unit tests.
 
 ## Code Conventions to Enforce in Plans
 
@@ -99,20 +99,9 @@ You MUST output the plan in exactly this markdown format:
 
 ## Test Plan
 
-All tests follow TDD — write tests BEFORE implementation at each phase.
+Tests are **endpoint integration tests only** — they exercise the full stack (router → service → repository → DB) via `httpx.AsyncClient`. No unit tests for domain, repository, or service layers.
 
-### Unit Tests: Service Layer
-| Test Name | Description | Edge Case? |
-|---|---|---|
-| `test_create_product_success` | ... | No |
-| `test_create_product_duplicate_slug_raises_conflict` | ... | Yes |
-
-### Integration Tests: Repository Layer
-| Test Name | Description | Edge Case? |
-|---|---|---|
-| `test_repository_save_and_retrieve` | ... | No |
-
-### API Tests: Router Layer
+### Endpoint Tests
 | Test Name | Description | Edge Case? |
 |---|---|---|
 | `test_post_product_201` | ... | No |

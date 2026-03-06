@@ -39,7 +39,8 @@ make test-back-cov ARGS="-v"
 
 ### Step 3: Check Coverage on New/Modified Files
 - From the coverage output, extract coverage percentage for each new or modified file under `app/`.
-- Flag any file below 80% coverage.
+- Focus on **router files** (`app/api/routers/`) — these should have high coverage since all tests are endpoint integration tests.
+- Domain, repository, and service files get indirect coverage through endpoint tests. Low coverage on these is acceptable if all endpoint tests pass and acceptance criteria are met.
 - Note specific uncovered lines (from `term-missing` output).
 
 ### Step 4: Run Ruff Linting
