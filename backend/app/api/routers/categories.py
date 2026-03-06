@@ -6,15 +6,17 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from app.api.deps import require_admin
 from app.db.engine import get_db_session
 from app.repositories.category_repository import CategoryRepository
+from app.repositories.product_repository import ProductRepository
 from app.schemas.category import (
     CategoryCreate,
     CategoryDetailResponse,
     CategoryResponse,
     CategoryUpdate,
     PaginatedCategoriesResponse,
-    PaginatedProductsStub,
 )
+from app.schemas.product import PaginatedProductsResponse
 from app.services.category import CategoryConflictError, CategoryService
+from app.services.product import ProductService
 
 # ─── Shared DI ───────────────────────────────────────────────────────────────
 
@@ -24,6 +26,14 @@ async def get_category_service(
 ) -> CategoryService:
     repository = CategoryRepository(session)
     return CategoryService(repository)
+
+
+async def get_product_service_for_categories(
+    session=Depends(get_db_session),
+) -> ProductService:
+    product_repository = ProductRepository(session)
+    category_repository = CategoryRepository(session)
+    return ProductService(product_repository, category_repository)
 
 
 # ─── Public Router ───────────────────────────────────────────────────────────
@@ -48,6 +58,7 @@ async def list_categories(
 async def get_category_by_slug(
     slug: str,
     service: Annotated[CategoryService, Depends(get_category_service)],
+    product_service: Annotated[ProductService, Depends(get_product_service_for_categories)],
     page: int = 1,
     size: int = 10,
 ):
@@ -55,8 +66,20 @@ async def get_category_by_slug(
     if not category:
         raise HTTPException(status_code=404, detail="Category not found.")
 
-    products_stub = PaginatedProductsStub(page=page, size=size)
-    return CategoryDetailResponse(category=category, products=products_stub)
+    # Fetch real products for this category
+    products, total = await product_service.list_active(
+        page=page,
+        size=size,
+        category_slug=slug,
+        search=None,
+        sort_by="name",
+        sort_direction="asc",
+    )
+    pages = math.ceil(total / size) if size > 0 else 0
+    products_response = PaginatedProductsResponse(
+        items=products, total=total, page=page, pages=pages, size=size
+    )
+    return CategoryDetailResponse(category=category, products=products_response)
 
 
 # ─── Admin Router ─────────────────────────────────────────────────────────────
