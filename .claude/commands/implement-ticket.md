@@ -38,7 +38,7 @@ After approval, in the **main context** (no subagent):
 Use the **Agent tool** to invoke the `tdd-implementer` subagent with this prompt:
 
 ```
-Execute the following approved implementation plan using strict TDD methodology. Work layer by layer (domain → model+migration → repository → service → schema → router). For EACH layer: write failing tests first, then write minimum code to pass, run tests, iterate until green. Do NOT advance to the next layer until current tests pass.
+Execute the following approved implementation plan. Work layer by layer (domain → model+migration → repository → service → schema → router), implementing all layers first. Then write endpoint integration tests at the end. Do NOT write unit tests for individual layers — only endpoint tests that exercise the full stack.
 
 Here is the approved plan:
 
@@ -46,13 +46,14 @@ Here is the approved plan:
 ```
 
 After the implementer finishes, make **granular conventional commits** in the main context:
-- `feat(ticket-$ARGUMENTS): add <entity> domain layer` (domain entities + their tests)
+- `feat(ticket-$ARGUMENTS): add <entity> domain layer` (domain entities + repository interface)
 - `feat(ticket-$ARGUMENTS): add database migration` (models + alembic migration)
-- `feat(ticket-$ARGUMENTS): add <entity> repository` (repository + tests)
-- `feat(ticket-$ARGUMENTS): add <entity> service layer` (service + tests)
-- `feat(ticket-$ARGUMENTS): add <entity> API endpoints` (schemas + router + tests)
+- `feat(ticket-$ARGUMENTS): add <entity> repository` (repository implementation)
+- `feat(ticket-$ARGUMENTS): add <entity> service layer` (service implementation)
+- `feat(ticket-$ARGUMENTS): add <entity> API endpoints` (schemas + router)
+- `test(ticket-$ARGUMENTS): add endpoint integration tests` (all tests in a single commit)
 
-Use `git add` per-file or per-directory to split changes into logical commits. Each commit includes the layer's tests WITH the implementation.
+Use `git add` per-file or per-directory to split changes into logical commits.
 
 ---
 
@@ -65,7 +66,7 @@ Verify the implementation of ticket $ARGUMENTS. Run the full verification pipeli
 ```
 
 If the reviewer reports issues:
-- **Coverage < 80%**: use the `tdd-implementer` subagent to add tests for uncovered lines
+- **Missing endpoint test coverage**: use the `tdd-implementer` subagent to add endpoint tests
 - **Lint issues**: fix in main context, commit: `style(ticket-$ARGUMENTS): fix linting issues`
 - **Failing tests**: use the `tdd-implementer` subagent to fix
 - **Re-verify** after fixes by invoking `code-review-verifier` again
@@ -120,8 +121,7 @@ In the **main context** (no subagent):
 
 ## Critical Rules
 
-- NEVER skip writing tests before implementation
-- NEVER proceed to next layer if current tests fail
+- Only write endpoint integration tests — NO unit tests for domain, repository, or service layers
 - NEVER commit code that doesn't pass tests
 - Follow ALL conventions from CLAUDE.md without exception
 - Use `uv` for Python deps, never pip

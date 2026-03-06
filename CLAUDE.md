@@ -20,16 +20,17 @@ make db-migrate                    # Run Alembic migrations
 make db-revision MSG="description" # Create new migration
 
 # Backend tests (requires running DB)
-make test-back                     # Run all backend tests
-cd backend && DATABASE_URL="..." BACKEND_SECRET_KEY="..." uv run pytest tests/test_health.py        # Single test file
-cd backend && DATABASE_URL="..." BACKEND_SECRET_KEY="..." uv run pytest tests/test_health.py -k test_name  # Single test
+make test-back                                          # Run all backend tests
+make test-back FILE=tests/test_health.py                # Single test file
+make test-back FILE=tests/test_health.py ARGS="-k test_name -v"  # Single test
+make test-back-cov                                      # Tests with coverage report
 
 # Frontend tests
 make test-front      # Run frontend tests (vitest)
 
-# Linting
-cd backend && uv run ruff check .    # Backend lint
-cd backend && uv run ruff format .   # Backend format
+# Linting & formatting
+make lint-back       # Backend lint + format check
+make format-back     # Backend auto-format
 cd frontend && npm run lint          # Frontend lint
 ```
 
@@ -87,3 +88,4 @@ When implementing a ticket, **always check `docs/infra-gaps.md`** for infrastruc
 - **DELETE responses**: 204 No Content (except cart endpoints which return the updated cart).
 - **i18n fields**: Stored as `dict[str, str]` JSON (e.g., `{"en": "Pocket", "es": "Bolsillo"}`).
 - **Soft deletes**: Use `deleted_at` timestamp, filter with `.where(Model.deleted_at.is_(None))`.
+- **Testing strategy**: Only write endpoint/integration tests (`httpx.AsyncClient` against real DB). No unit tests for domain entities, repositories, or services. The API tests cover all layers end-to-end.

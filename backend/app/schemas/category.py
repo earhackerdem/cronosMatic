@@ -57,19 +57,10 @@ class PaginatedCategoriesResponse(BaseModel):
     size: int
 
 
-class PaginatedProductsStub(BaseModel):
-    """Stub for the product list embedded in a category detail response.
-
-    Products are implemented in Ticket 03; this returns empty pagination.
-    """
-
-    items: list = []
-    total: int = 0
-    page: int
-    pages: int = 0
-    size: int
-
-
 class CategoryDetailResponse(BaseModel):
+    from app.schemas.product import (
+        PaginatedProductsResponse as _PaginatedProductsResponse,
+    )
+
     category: CategoryResponse
-    products: PaginatedProductsStub
+    products: _PaginatedProductsResponse

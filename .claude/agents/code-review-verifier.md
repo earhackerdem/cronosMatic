@@ -31,7 +31,7 @@ Execute these steps in order, collecting all results before producing your final
 ### Step 2: Run the Full Test Suite
 Run:
 ```bash
-cd backend && DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/cronosmatic" BACKEND_SECRET_KEY="dev-secret-key" uv run pytest --cov=app --cov-report=term-missing -v
+make test-back-cov ARGS="-v"
 ```
 - Record: total tests, passed, failed, errors, skipped.
 - For any failures, capture the test name, file, and failure reason.
@@ -39,14 +39,14 @@ cd backend && DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:543
 
 ### Step 3: Check Coverage on New/Modified Files
 - From the coverage output, extract coverage percentage for each new or modified file under `app/`.
-- Flag any file below 80% coverage.
+- Focus on **router files** (`app/api/routers/`) — these should have high coverage since all tests are endpoint integration tests.
+- Domain, repository, and service files get indirect coverage through endpoint tests. Low coverage on these is acceptable if all endpoint tests pass and acceptance criteria are met.
 - Note specific uncovered lines (from `term-missing` output).
 
 ### Step 4: Run Ruff Linting
-Run both commands:
+Run:
 ```bash
-cd backend && uv run ruff check .
-cd backend && uv run ruff format --check .
+make lint-back
 ```
 - Record all lint violations with file, line, rule code, and message.
 - Record all formatting issues.
