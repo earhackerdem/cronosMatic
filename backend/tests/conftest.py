@@ -47,7 +47,9 @@ async def db_session():
     # Clean up test data (truncate, not drop)
     async with engine.begin() as conn:
         await conn.execute(
-            text("TRUNCATE TABLE refresh_tokens, users RESTART IDENTITY CASCADE")
+            text(
+                "TRUNCATE TABLE categories, refresh_tokens, users RESTART IDENTITY CASCADE"
+            )
         )
 
     await engine.dispose()
@@ -85,7 +87,9 @@ async def client():
     # Clean up test data
     async with engine.begin() as conn:
         await conn.execute(
-            text("TRUNCATE TABLE refresh_tokens, users RESTART IDENTITY CASCADE")
+            text(
+                "TRUNCATE TABLE categories, refresh_tokens, users RESTART IDENTITY CASCADE"
+            )
         )
 
     await engine.dispose()
