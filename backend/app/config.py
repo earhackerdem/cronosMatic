@@ -34,6 +34,11 @@ class Settings(BaseSettings):
         description="PostgreSQL connection string. Set via DATABASE_URL env var.",
     )
 
+    redis_url: str = Field(
+        default="redis://localhost:6379/0",
+        validation_alias="REDIS_URL",
+    )
+
     model_config = {"env_prefix": "BACKEND_"}
 
     @computed_field  # type: ignore[prop-decorator]
