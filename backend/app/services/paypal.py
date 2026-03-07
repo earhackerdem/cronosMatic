@@ -19,9 +19,9 @@ class PayPalPaymentService:
     def __init__(self) -> None:
         self._access_token: str | None = None
         if settings.paypal_mode == "live":
-            self._base_url = "https://api.paypal.com"
+            self.base_url = "https://api.paypal.com"
         else:
-            self._base_url = "https://api.sandbox.paypal.com"
+            self.base_url = "https://api.sandbox.paypal.com"
 
     async def get_access_token(self) -> str:
         if self._access_token:
@@ -31,12 +31,12 @@ class PayPalPaymentService:
         ).decode()
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                f"{self._base_url}/v1/oauth2/token",
+                f"{self.base_url}/v1/oauth2/token",
                 headers={
                     "Authorization": f"Basic {credentials}",
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-                data="grant_type=client_credentials",
+                content="grant_type=client_credentials",
             )
         if resp.status_code != 200:
             raise PayPalAuthError(f"Failed to obtain access token: {resp.text}")
@@ -122,7 +122,7 @@ class PayPalPaymentService:
 
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                f"{self._base_url}/v2/checkout/orders",
+                f"{self.base_url}/v2/checkout/orders",
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",
@@ -156,7 +156,7 @@ class PayPalPaymentService:
         token = await self.get_access_token()
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                f"{self._base_url}/v2/checkout/orders/{paypal_order_id}/capture",
+                f"{self.base_url}/v2/checkout/orders/{paypal_order_id}/capture",
                 headers={
                     "Authorization": f"Bearer {token}",
                     "Content-Type": "application/json",

@@ -267,6 +267,6 @@ async def verify_paypal_config(
         client_id_configured=bool(settings.paypal_client_id),
         client_secret_configured=bool(settings.paypal_client_secret),
         simulate_payments=settings.paypal_simulate_payments,
-        base_url=paypal_service._base_url,
+        base_url=paypal_service.base_url,
         auth_test=auth_test,
     )
