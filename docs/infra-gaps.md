@@ -36,8 +36,8 @@ Each should be resolved **during the ticket that introduces the dependency**.
 - ~~Add `REDIS_URL` to `.env.example` and compose backend env~~ — added to both + `config.py`
 - ~~Add `redis` Python package to `pyproject.toml`~~ — added via `uv add redis`
 
-## Ticket 06 (Orders)
-- Add `DEFAULT_SHIPPING_COST` to `.env.example` and compose
+## Ticket 06 (Orders) ✅ RESOLVED
+- ~~Add `DEFAULT_SHIPPING_COST` to `.env.example` and compose~~ — added `BACKEND_DEFAULT_SHIPPING_COST` to `.env.example`, `.env`, `docker-compose.yml`, and `config.py`
 
 ## Ticket 07 (PayPal)
 - Add `httpx` to prod dependencies in `pyproject.toml` (currently only in dev)
