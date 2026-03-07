@@ -28,14 +28,14 @@ def upgrade() -> None:
         sa.Column("type", sa.String(length=20), nullable=False),
         sa.Column("first_name", sa.String(length=100), nullable=False),
         sa.Column("last_name", sa.String(length=100), nullable=False),
-        sa.Column("company", sa.String(length=200), nullable=True),
+        sa.Column("company", sa.String(length=255), nullable=True),
         sa.Column("address_line_1", sa.String(length=255), nullable=False),
         sa.Column("address_line_2", sa.String(length=255), nullable=True),
         sa.Column("city", sa.String(length=100), nullable=False),
         sa.Column("state", sa.String(length=100), nullable=False),
         sa.Column("postal_code", sa.String(length=20), nullable=False),
         sa.Column("country", sa.String(length=100), nullable=False),
-        sa.Column("phone", sa.String(length=30), nullable=True),
+        sa.Column("phone", sa.String(length=20), nullable=True),
         sa.Column(
             "is_default", sa.Boolean(), server_default=sa.text("false"), nullable=False
         ),
