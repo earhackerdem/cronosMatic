@@ -39,9 +39,9 @@ Each should be resolved **during the ticket that introduces the dependency**.
 ## Ticket 06 (Orders) ✅ RESOLVED
 - ~~Add `DEFAULT_SHIPPING_COST` to `.env.example` and compose~~ — added `BACKEND_DEFAULT_SHIPPING_COST` to `.env.example`, `.env`, `docker-compose.yml`, and `config.py`
 
-## Ticket 07 (PayPal)
-- Add `httpx` to prod dependencies in `pyproject.toml` (currently only in dev)
-- Add `PAYPAL_*`, `PAYMENT_CURRENCY`, `PAYMENT_COUNTRY_CODE` to `.env.example` and compose
+## Ticket 07 (PayPal) ✅ RESOLVED
+- ~~Add `httpx` to prod dependencies in `pyproject.toml` (currently only in dev)~~ — moved from dev to prod deps
+- ~~Add `PAYPAL_*`, `PAYMENT_CURRENCY`, `PAYMENT_COUNTRY_CODE` to `.env.example` and compose~~ — added all 7 env vars to `.env.example`, `docker-compose.yml`, and `config.py`
 
 ## Ticket 08 (Emails + Celery)
 - Add `celery-worker` and `celery-beat` services to `docker-compose.yml`

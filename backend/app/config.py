@@ -29,6 +29,14 @@ class Settings(BaseSettings):
         description="Default shipping cost. Set via BACKEND_DEFAULT_SHIPPING_COST.",
     )
 
+    paypal_client_id: str = Field(default="")
+    paypal_client_secret: str = Field(default="")
+    paypal_mode: str = Field(default="sandbox")
+    paypal_simulate_payments: bool = Field(default=True)
+    payment_currency: str = Field(default="MXN")
+    payment_country_code: str = Field(default="MX")
+    frontend_url: str = Field(default="http://localhost:5173")
+
     aws_access_key_id: str = Field(default="", validation_alias="AWS_ACCESS_KEY_ID")
     aws_secret_access_key: str = Field(
         default="", validation_alias="AWS_SECRET_ACCESS_KEY"
