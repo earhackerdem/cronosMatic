@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings
 
@@ -20,6 +22,11 @@ class Settings(BaseSettings):
     storage_base_url: str = Field(
         default="",
         description="Base URL for S3/storage assets. Set via BACKEND_STORAGE_BASE_URL.",
+    )
+
+    default_shipping_cost: Decimal = Field(
+        default=Decimal("10.00"),
+        description="Default shipping cost. Set via BACKEND_DEFAULT_SHIPPING_COST.",
     )
 
     aws_access_key_id: str = Field(default="", validation_alias="AWS_ACCESS_KEY_ID")
