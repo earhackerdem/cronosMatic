@@ -19,6 +19,7 @@ from app.main import app
 
 # Import all models so they register with Base.metadata
 from app.models import Item  # noqa: F401
+from app.models.address import AddressModel  # noqa: F401
 from app.models.cart import CartItemModel, CartModel  # noqa: F401
 from app.models.category import CategoryModel  # noqa: F401
 from app.models.product import ProductModel  # noqa: F401
@@ -50,7 +51,7 @@ async def db_session():
     async with engine.begin() as conn:
         await conn.execute(
             text(
-                "TRUNCATE TABLE cart_items, carts, products, categories, refresh_tokens, users RESTART IDENTITY CASCADE"
+                "TRUNCATE TABLE addresses, cart_items, carts, products, categories, refresh_tokens, users RESTART IDENTITY CASCADE"
             )
         )
 
@@ -90,7 +91,7 @@ async def client():
     async with engine.begin() as conn:
         await conn.execute(
             text(
-                "TRUNCATE TABLE cart_items, carts, products, categories, refresh_tokens, users RESTART IDENTITY CASCADE"
+                "TRUNCATE TABLE addresses, cart_items, carts, products, categories, refresh_tokens, users RESTART IDENTITY CASCADE"
             )
         )
 
