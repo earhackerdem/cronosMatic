@@ -3,6 +3,4 @@
 set -e
 set -x
 
-coverage run -m pytest tests/
-coverage report
-coverage html --title "${@-coverage}"
+pytest --cov=app --cov-report=term-missing --cov-report=html tests/ "$@"
