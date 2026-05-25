@@ -1,4 +1,4 @@
-# FastAPI Project - Backend
+# CronosMatic - Backend
 
 ## Requirements
 
