@@ -122,7 +122,7 @@ git merge --continue
 
 ### Configure
 
-You can then update configs in the `.env` files to customize your configurations.
+You can then update configs in the `.env` file to customize your configurations.
 
 Before deploying it, make sure you change at least the values for:
 
@@ -134,17 +134,42 @@ You can (and should) pass these as environment variables from secrets.
 
 Read the [deployment.md](./deployment.md) docs for more details.
 
-### Generate Secret Keys
+### Local Setup (one command)
 
-Some environment variables in the `.env` file have a default value of `changethis`.
-
-You have to change them with a secret key, to generate secret keys you can run the following command:
+This project uses [`just`](https://github.com/casey/just) as a command runner. Install it first:
 
 ```bash
-python -c "import secrets; print(secrets.token_urlsafe(32))"
+brew install just   # macOS
+# or: cargo install just
 ```
 
-Copy the content and use that as password / secret key. And run that again to generate another secure key.
+Then bootstrap the entire local environment with a single command:
+
+```bash
+just setup
+```
+
+This will:
+1. Create `.env` from `.env.example` if it doesn't exist
+2. Automatically generate secure random values for all `changethis` placeholders (`SECRET_KEY`, `FIRST_SUPERUSER_PASSWORD`, `POSTGRES_PASSWORD`)
+3. Build images and start all containers with `docker compose up --build -d`
+
+Re-running `just setup` is safe — existing secrets are never overwritten.
+
+### Available Commands
+
+```
+just setup               # Bootstrap environment (first-time or after down -v)
+just test                # Run backend test suite with coverage
+just lint                # Run mypy + ruff check
+just format              # Run ruff format
+just db-makemigrations "message"  # Generate Alembic migration
+just db-migrate          # Apply pending migrations
+just logs                # Tail all container logs
+just down                # Stop and remove containers
+```
+
+Run `just` or `just --list` to see all available recipes.
 
 ## How To Use It - Alternative With Copier
 
