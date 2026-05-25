@@ -78,9 +78,9 @@ services:
             - .venv
         - path: ./backend/pyproject.toml
           action: rebuild
-    # TODO: remove once coverage is done locally
     volumes:
       - ./backend/htmlcov:/app/backend/htmlcov
+      - ./backend/tests:/app/backend/tests
     environment:
       SMTP_HOST: "mailcatcher"
       SMTP_PORT: "1025"
