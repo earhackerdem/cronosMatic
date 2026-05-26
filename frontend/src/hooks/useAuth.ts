@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  type QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 
 import {
@@ -11,8 +16,16 @@ import {
 import { handleError } from "@/utils"
 import useCustomToast from "./useCustomToast"
 
+const ACCESS_TOKEN_KEY = "access_token"
+const CURRENT_USER_QUERY_KEY = ["currentUser"] as const
+
 const isLoggedIn = () => {
-  return localStorage.getItem("access_token") !== null
+  return localStorage.getItem(ACCESS_TOKEN_KEY) !== null
+}
+
+const persistGoogleToken = (token: string, queryClient: QueryClient) => {
+  localStorage.setItem(ACCESS_TOKEN_KEY, token)
+  queryClient.invalidateQueries({ queryKey: CURRENT_USER_QUERY_KEY })
 }
 
 const useAuth = () => {
@@ -21,7 +34,7 @@ const useAuth = () => {
   const { showErrorToast } = useCustomToast()
 
   const { data: user } = useQuery<UserPublic | null, Error>({
-    queryKey: ["currentUser"],
+    queryKey: CURRENT_USER_QUERY_KEY,
     queryFn: UsersService.readUserMe,
     enabled: isLoggedIn(),
   })
@@ -42,7 +55,7 @@ const useAuth = () => {
     const response = await LoginService.loginAccessToken({
       formData: data,
     })
-    localStorage.setItem("access_token", response.access_token)
+    localStorage.setItem(ACCESS_TOKEN_KEY, response.access_token)
   }
 
   const loginMutation = useMutation({
@@ -53,18 +66,23 @@ const useAuth = () => {
     onError: handleError.bind(showErrorToast),
   })
 
+  const loginWithGoogleToken = (token: string) => {
+    persistGoogleToken(token, queryClient)
+  }
+
   const logout = () => {
-    localStorage.removeItem("access_token")
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
     navigate({ to: "/login" })
   }
 
   return {
     signUpMutation,
     loginMutation,
+    loginWithGoogleToken,
     logout,
     user,
   }
 }
 
-export { isLoggedIn }
+export { isLoggedIn, persistGoogleToken }
 export default useAuth

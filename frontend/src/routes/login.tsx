@@ -3,12 +3,15 @@ import {
   createFileRoute,
   Link as RouterLink,
   redirect,
+  useNavigate,
 } from "@tanstack/react-router"
+import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { AuthLayout } from "@/components/Common/AuthLayout"
+import { GoogleLoginButton } from "@/components/Common/GoogleLoginButton"
 import {
   Form,
   FormControl,
@@ -21,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
+import useCustomToast from "@/hooks/useCustomToast"
 
 const formSchema = z.object({
   username: z.email(),
@@ -32,8 +36,13 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
+const loginSearchSchema = z.object({
+  authError: z.literal("google").optional(),
+})
+
 export const Route = createFileRoute("/login")({
   component: Login,
+  validateSearch: loginSearchSchema,
   beforeLoad: async () => {
     if (isLoggedIn()) {
       throw redirect({
@@ -52,6 +61,9 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const { loginMutation } = useAuth()
+  const { authError } = Route.useSearch()
+  const navigate = useNavigate()
+  const { showErrorToast } = useCustomToast()
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
@@ -61,6 +73,20 @@ function Login() {
       password: "",
     },
   })
+
+  const toastFired = useRef(false)
+  useEffect(() => {
+    if (authError !== "google" || toastFired.current) return
+    toastFired.current = true
+    showErrorToast(
+      "Google login failed. Please try again or use email and password.",
+    )
+    navigate({ to: "/login", search: {}, replace: true })
+    // Deliberately depend only on `authError`. `navigate` and
+    // `showErrorToast` are new references each render — including them
+    // re-fires the effect every render. The ref guards against React
+    // StrictMode's intentional double-invocation in dev.
+  }, [authError])
 
   const onSubmit = (data: FormData) => {
     if (loginMutation.isPending) return
@@ -77,6 +103,8 @@ function Login() {
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">Login to your account</h1>
           </div>
+
+          <GoogleLoginButton />
 
           <div className="grid gap-4">
             <FormField

@@ -7,6 +7,7 @@ import {
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { AuthLayout } from "@/components/Common/AuthLayout"
+import { GoogleLoginButton } from "@/components/Common/GoogleLoginButton"
 import {
   Form,
   FormControl,
@@ -89,6 +90,8 @@ function SignUp() {
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">Create an account</h1>
           </div>
+
+          <GoogleLoginButton />
 
           <div className="grid gap-4">
             <FormField
