@@ -27,6 +27,12 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
+    oauth_user = crud.get_user_by_email(session=session, email=form_data.username)
+    if oauth_user and oauth_user.hashed_password is None:
+        raise HTTPException(
+            status_code=400,
+            detail="This account was created with Google. Please sign in with Google.",
+        )
     user = crud.authenticate(
         session=session, email=form_data.username, password=form_data.password
     )

@@ -27,6 +27,19 @@ db-makemigrations message:
 db-migrate:
     docker compose exec backend alembic upgrade head
 
+# Recreate containers to pick up changes in .env (compose only re-reads env_file on create, not restart)
+env-reload:
+    docker compose up -d
+
+# Rebuild and restart a single service (use after backend code changes when not running `just watch`).
+# Usage: just rebuild backend
+rebuild service:
+    docker compose up -d --build {{service}}
+
+# Live-sync local source into containers using compose develop.watch (runs in foreground)
+watch:
+    docker compose watch
+
 # Tail all container logs
 logs:
     docker compose logs -f
