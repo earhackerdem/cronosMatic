@@ -127,3 +127,127 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=128)
+
+
+# ---------------------------------------------------------------------------
+# Catalog: Movement
+# ---------------------------------------------------------------------------
+
+class MovementBase(SQLModel):
+    name: str = Field(unique=True, index=True, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class MovementCreate(MovementBase):
+    pass
+
+
+class MovementUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class Movement(MovementBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+
+class MovementPublic(MovementBase):
+    id: uuid.UUID
+
+
+class MovementsPublic(SQLModel):
+    data: list[MovementPublic]
+    count: int
+
+
+# ---------------------------------------------------------------------------
+# Catalog: CaseMaterial
+# ---------------------------------------------------------------------------
+
+class CaseMaterialBase(SQLModel):
+    name: str = Field(unique=True, index=True, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class CaseMaterialCreate(CaseMaterialBase):
+    pass
+
+
+class CaseMaterialUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class CaseMaterial(CaseMaterialBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+
+class CaseMaterialPublic(CaseMaterialBase):
+    id: uuid.UUID
+
+
+class CaseMaterialsPublic(SQLModel):
+    data: list[CaseMaterialPublic]
+    count: int
+
+
+# ---------------------------------------------------------------------------
+# Catalog: TargetGender
+# ---------------------------------------------------------------------------
+
+class TargetGenderBase(SQLModel):
+    name: str = Field(unique=True, index=True, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class TargetGenderCreate(TargetGenderBase):
+    pass
+
+
+class TargetGenderUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class TargetGender(TargetGenderBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+
+class TargetGenderPublic(TargetGenderBase):
+    id: uuid.UUID
+
+
+class TargetGendersPublic(SQLModel):
+    data: list[TargetGenderPublic]
+    count: int
+
+
+# ---------------------------------------------------------------------------
+# Catalog: WatchStyle
+# ---------------------------------------------------------------------------
+
+class WatchStyleBase(SQLModel):
+    name: str = Field(unique=True, index=True, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class WatchStyleCreate(WatchStyleBase):
+    pass
+
+
+class WatchStyleUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+
+
+class WatchStyle(WatchStyleBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+
+class WatchStylePublic(WatchStyleBase):
+    id: uuid.UUID
+
+
+class WatchStylesPublic(SQLModel):
+    data: list[WatchStylePublic]
+    count: int
